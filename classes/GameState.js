@@ -1,16 +1,11 @@
-// src/GameState.js
+// src/classes/GameState.js
 import { CONFIG } from "./Config.js";
 
-/**
- * Runtime game state.
- * Player object holds current editable stats (copied from CONFIG).
- */
 export const GameState = {
     score: 0,
     wave: 1,
     isPaused: false,
 
-    // current player runtime stats (initialized from CONFIG)
     player: {
         hp: CONFIG.PLAYER.HEALTH,
         maxHP: CONFIG.PLAYER.HEALTH,
@@ -22,18 +17,40 @@ export const GameState = {
         ammo: CONFIG.WEAPON.AMMO,
     },
 
-    // skill runtime info (timers in ms)
     skills: {
-        grenadeCooldown: 0,
-        shieldCooldown: 0,
-        overdriveCooldown: 0,
-        nukeCooldown: 0,
+        // --- RUNTIME TIMERS (These count down to 0) ---
+        grenadeTimer: 0,
+        shieldTimer: 0,
+        overdriveTimer: 0,
+        nukeTimer: 0,
 
+        // --- ACTIVE STATES ---
         isShieldActive: false,
         isOverdriveActive: false,
-
-        // internal end times (ms since epoch) set by SkillsManager
         _shieldEndTime: 0,
         _overdriveEndTime: 0,
+
+        // --- UPGRADEABLE STATS (Initialized from CONFIG) ---
+        // If you get an upgrade, you modify THESE values, not Config.
+        
+        // Grenade Stats
+        grenadeMaxCooldown: CONFIG.SKILLS.GRENADE.COOLDOWN,
+        grenadeDmgMult: CONFIG.SKILLS.GRENADE.DMG_MULTIPLIER,
+        grenadeRadius: CONFIG.SKILLS.GRENADE.SIZE,
+        grenadeDist: CONFIG.SKILLS.GRENADE.THROW_DIST,
+
+        // Shield Stats
+        shieldMaxCooldown: CONFIG.SKILLS.SHIELD.COOLDOWN,
+        shieldDuration: CONFIG.SKILLS.SHIELD.DURATION,
+
+        // Overdrive Stats
+        overdriveMaxCooldown: CONFIG.SKILLS.OVERDRIVE.COOLDOWN,
+        overdriveDuration: CONFIG.SKILLS.OVERDRIVE.DURATION,
+        overdriveRateMult: CONFIG.SKILLS.OVERDRIVE.FIRE_RATE_MULTIPLIER,
+
+        // Nuke Stats
+        nukeMaxCooldown: CONFIG.SKILLS.NUKE.COOLDOWN,
+        nukeDmg: CONFIG.SKILLS.NUKE.DAMAGE,
+        nukeRadius: CONFIG.SKILLS.NUKE.RADIUS,
     }
 };

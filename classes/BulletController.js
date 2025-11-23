@@ -2,10 +2,11 @@ import { Bullet } from "./Bullet.js";
 import { CONFIG } from "./Config.js";
 
 export class BulletController {
-    constructor(scene) {
+    constructor(scene,statsManager) {
         this.scene = scene;
+        this.stats = statsManager;
         this.lastFired = 0;
-        
+
         this.createBulletTexture();
 
         this.bulletGroup = this.scene.physics.add.group({
@@ -44,8 +45,9 @@ export class BulletController {
 
     shoot(x, y, angle) {
         const time = this.scene.time.now;
+        const currentFireRate = this.stats.getFireRate()
 
-        if (time > this.lastFired + CONFIG.WEAPON.FIRE_RATE) {
+        if (time > this.lastFired + currentFireRate) {
             
             const bullet = this.bulletGroup.get();
 

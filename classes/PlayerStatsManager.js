@@ -10,9 +10,9 @@ import { CONFIG } from "./Config.js";
 export class PlayerStatsManager {
     constructor(scene) {
         this.scene = scene;
-        // quick local ref
         this.state = GameState.player;
         this.config = CONFIG;
+        this.fireRateMultiplier = 1.0;
     }
 
     // re-initialize from CONFIG (useful on new run)
@@ -31,7 +31,7 @@ export class PlayerStatsManager {
     getSpeed() { return this.state.speed; }
     getRunSpeed() { return this.state.runSpeed; }
     getFireRate() { // current effective fire rate (ms)
-        return this.state.fireRate;
+        return this.state.fireRate * this.fireRateMultiplier;
     }
     getBulletDamage() { return this.state.bulletDmg; }
 
@@ -69,14 +69,12 @@ export class PlayerStatsManager {
 
     // temporary buffs from skills
     startOverdrive(durationMs, multiplier = 0.5) {
-        // multiplier reduces fireRate (ms) -> smaller is faster
-        this._overdriveOriginal = this.state.fireRate;
-        this.state.fireRate = Math.max(10, Math.floor(this.state.fireRate * multiplier));
-        // schedule revert
+        // Set the multiplier (0.5 means firing twice as fast)
+        this.fireRateMultiplier = multiplier;
+        
+        // Schedule revert back to 1.0
         this.scene.time.delayedCall(durationMs, () => {
-            // ensure we don't overwrite a new overdrive (defensive)
-            this.state.fireRate = this._overdriveOriginal;
-            delete this._overdriveOriginal;
+            this.fireRateMultiplier = 1.0;
         });
     }
 
