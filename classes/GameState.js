@@ -54,10 +54,4 @@ export const GameState = {
         nukeDmg: CONFIG.SKILLS.NUKE.DAMAGE,
         nukeRadius: CONFIG.SKILLS.NUKE.RADIUS,
     },
-    enemies: {
-        spawnRate: CONFIG.ENEMIES.BASE_SPAWN_RATE,
-        enemey1Health: CONFIG.ENEMIES.TYPES[1].HP,
-        enemey1Speed: CONFIG.ENEMIES.TYPES[1].SPEED,
-        enemey1Damage: CONFIG.ENEMIES.TYPES[1].DMG,
-    }
 };

@@ -2,7 +2,7 @@ import { CONFIG } from "../classes/Config.js";
 
 export class Enemy extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y) {
-        // Default texture 'Enemy_1' used for initial creation
+
         super(scene, x, y, 'Enemy_1');
         this.scene = scene;
     }
@@ -18,7 +18,6 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         // Get Stats
         const stats = CONFIG.ENEMIES.TYPES[typeId];
         
-        // 1. KEY CHANGE: Update the Texture based on the Type ID
         this.setTexture(stats.KEY);
 
         this.typeId = typeId;
@@ -26,9 +25,6 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.damage = stats.DMG;
         this.moveSpeed = stats.SPEED;
         this.scoreValue = stats.SCORE;
-        
-        // If you want to tint them slightly to differentiate further (optional)
-        // this.setTint(stats.COLOR); 
 
         // AI State for Heavy Enemy
         this.isCharging = false;
