@@ -92,7 +92,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         });
     }
 
-    takeDamage(amount) {
+    takeDamage(amount, skipDeathEffect = false) {
         this.hp -= amount;
         
         // Hit Flash
@@ -105,7 +105,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         });
 
         if (this.hp <= 0) {
-            if (this.typeId === 4) this.explode(); // Exploder blows up on death
+            if (this.typeId === 4 && !skipDeathEffect) this.explode(); // Exploder blows up on death
             else this.die();
         }
     }

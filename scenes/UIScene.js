@@ -1,5 +1,4 @@
 import { GameState } from "../classes/GameState.js";
-import { CONFIG } from "../classes/Config.js";
 
 export class UIScene extends Phaser.Scene {
     constructor() {
@@ -10,95 +9,110 @@ export class UIScene extends Phaser.Scene {
         const width = this.scale.width;
         const height = this.scale.height;
 
-        // --- 1. HEALTH BAR SETUP ---
-        // We use Graphics for the bar because it's dynamic
-        this.hpBar = this.add.graphics();
-        
-        // Add a text label next to the bar
-        this.hpText = this.add.text(20, 20, "HP", {
-            fontSize: '20px',
-            fill: '#ffffff',
-            fontFamily: 'Arial',
-            fontStyle: 'bold'
+        // --- 1. HP DISPLAY ONLY (NO BAR) ---
+        this.hpText = this.add.text(20, 20, "HP: 100", {
+            fontSize: "36px",
+            fontFamily: "Arial",
+            fontStyle: "bold",
+            color: "#ffffffff"
         });
 
-        // --- 2. SKILL COOLDOWN SETUP ---
-        // We create a container or just list them at the bottom
-        const skillY = height - 50;
-        const startX = 50;
-        const gap = 100;
+        // --- 2. SKILL UI SETUP ---
+        const baseY = height - 70;
+        const startX = 70;
+        const gap = 120;
 
-        // Helper to create skill text
-        this.createSkillDisplay(startX, skillY, "C", "Grenade");
-        this.createSkillDisplay(startX + gap, skillY, "Q", "Shield");
-        this.createSkillDisplay(startX + gap * 2, skillY, "E", "Overdrive");
-        this.createSkillDisplay(startX + gap * 3, skillY, "Z", "Nuke");
-
-        // Store references to the dynamic text objects so we can update them
-        this.skillTexts = {
-            Grenade: this.add.text(startX, skillY - 20, "", { fontSize: '14px', fill: '#fff' }),
-            Shield: this.add.text(startX + gap, skillY - 20, "", { fontSize: '14px', fill: '#fff' }),
-            Overdrive: this.add.text(startX + gap * 2, skillY - 20, "", { fontSize: '14px', fill: '#fff' }),
-            Nuke: this.add.text(startX + gap * 3, skillY - 20, "", { fontSize: '14px', fill: '#fff' })
+        this.skillUI = {
+            Grenade: this.createSkillBox(startX, baseY, "C", "Grenade"),
+            Shield: this.createSkillBox(startX + gap, baseY, "Q", "Shield"),
+            Overdrive: this.createSkillBox(startX + gap * 2, baseY, "E", "Overdrive"),
+            Nuke: this.createSkillBox(startX + gap * 3, baseY, "Z", "Nuke")
         };
     }
 
-    createSkillDisplay(x, y, key, name) {
-        // Draw the Key Box (Static)
-        this.add.rectangle(x, y, 50, 50, 0x333333).setStrokeStyle(2, 0xffffff);
-        this.add.text(x, y, key, { fontSize: '24px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5);
-        this.add.text(x, y + 35, name, { fontSize: '12px', fill: '#aaa' }).setOrigin(0.5);
+    // Creates one skill box
+    createSkillBox(x, y, key, name) {
+
+        const box = this.add.rectangle(x, y, 60, 60, 0x222222)
+            .setStrokeStyle(3, 0xffffff)
+            .setOrigin(0.5);
+
+        const insideText = this.add.text(x, y, key, {
+            fontSize: "32px",
+            fontFamily: "Arial",
+            fontStyle: "bold",
+            color: "#ffffff"
+        }).setOrigin(0.5);
+
+        const label = this.add.text(x, y + 45, name, {
+            fontSize: "18px",
+            fontFamily: "Arial",
+            fontStyle: "bold",
+            color: "#eeeeee"
+        }).setOrigin(0.5);
+
+        return { box, insideText, label, key };
     }
 
-    update() {
-        // --- UPDATE HEALTH BAR ---
-        this.updateHealthBar();
+update(time, delta) {
+    this.updateHP(time);
+    this.updateSkills();
+}
 
-        // --- UPDATE SKILLS ---
-        this.updateSkillTimer("Grenade", GameState.skills.grenadeTimer);
-        this.updateSkillTimer("Shield", GameState.skills.shieldTimer);
-        this.updateSkillTimer("Overdrive", GameState.skills.overdriveTimer);
-        this.updateSkillTimer("Nuke", GameState.skills.nukeTimer);
+
+updateHP() {
+    const hp = GameState.player.hp;
+    this.hpText.setText(`HP: ${hp}`);
+
+    // --- Moderate pulsing (same speed always) ---
+    const pulse = (Math.sin(this.time.now * 0.004) + 1) / 2; // smooth 0..1
+
+    // Base + pulse colors (dark red → bright red)
+    const baseColor = 0x880000;
+    const pulseColor = 0xff0000;
+
+    const r = Phaser.Math.Interpolation.Linear([
+        (baseColor >> 16) & 255,
+        (pulseColor >> 16) & 255
+    ], pulse);
+
+    const g = Phaser.Math.Interpolation.Linear([
+        (baseColor >> 8) & 255,
+        (pulseColor >> 8) & 255
+    ], pulse);
+
+    const b = Phaser.Math.Interpolation.Linear([
+        baseColor & 255,
+        pulseColor & 255
+    ], pulse);
+
+    const finalColor = Phaser.Display.Color.GetColor(r, g, b);
+
+    this.hpText.setColor("#" + finalColor.toString(16));
+}
+
+
+    updateSkills() {
+        const skills = GameState.skills;
+
+        this.updateSkillDisplay("Grenade", skills.grenadeTimer);
+        this.updateSkillDisplay("Shield", skills.shieldTimer);
+        this.updateSkillDisplay("Overdrive", skills.overdriveTimer);
+        this.updateSkillDisplay("Nuke", skills.nukeTimer);
     }
 
-    updateHealthBar() {
-        this.hpBar.clear();
+    updateSkillDisplay(name, timer) {
+        const ui = this.skillUI[name];
 
-        const x = 60;
-        const y = 20;
-        const w = 200;
-        const h = 20;
+        if (!ui) return;
 
-        // 1. Background (Black)
-        this.hpBar.fillStyle(0x000000);
-        this.hpBar.fillRect(x, y, w, h);
-
-        // 2. Health Fill (Red)
-        const hpPercent = Phaser.Math.Clamp(GameState.player.hp / GameState.player.maxHP, 0, 1);
-        
-        // Color changes based on HP (Green -> Yellow -> Red)
-        if (hpPercent > 0.5) this.hpBar.fillStyle(0x00ff00);
-        else if (hpPercent > 0.25) this.hpBar.fillStyle(0xffff00);
-        else this.hpBar.fillStyle(0xff0000);
-
-        this.hpBar.fillRect(x, y, w * hpPercent, h);
-
-        // 3. Border (White)
-        this.hpBar.lineStyle(2, 0xffffff);
-        this.hpBar.strokeRect(x, y, w, h);
-    }
-
-    updateSkillTimer(name, timer) {
-        const textObj = this.skillTexts[name];
-        
         if (timer > 0) {
-            // Convert ms to seconds (e.g., 2500ms -> 2.5)
-            const seconds = (timer / 1000).toFixed(1);
-            textObj.setText(seconds);
-            textObj.setColor('#ff0000'); // Red when on cooldown
+            const sec = (timer / 1000).toFixed(1);
+            ui.insideText.setText(sec);
+            ui.insideText.setColor("#ff4444");
         } else {
-            textObj.setText("READY");
-            textObj.setColor('#00ff00'); // Green when ready
+            ui.insideText.setText(ui.key);
+            ui.insideText.setColor("#ffffffff"); 
         }
     }
 }

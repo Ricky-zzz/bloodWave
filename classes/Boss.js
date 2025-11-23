@@ -67,14 +67,14 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
 
     fireAimedShot(player) {
         const angle = Phaser.Math.Angle.Between(this.x, this.y, player.x, player.y);
-        this.bulletController.fireBullet(this.x, this.y, angle, this.bulletSpeed, this.damage);
+        this.bulletController.fireBullet(this.x, this.y, angle, this.bulletSpeed, this.damage, this);
     }
 
     fireSpinAttack() {
         // Fire 8 bullets in a circle
         for (let i = 0; i < 8; i++) {
             const angle = this.rotation + (i * (Math.PI / 4)); 
-            this.bulletController.fireBullet(this.x, this.y, angle, this.bulletSpeed * 0.8, this.damage);
+            this.bulletController.fireBullet(this.x, this.y, angle, this.bulletSpeed * 0.8, this.damage, this);
         }
     }
 
@@ -114,6 +114,9 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
         this.setVisible(false);
         this.body.stop();
         
+        // Clear bullets fired by this boss
+        this.bulletController.clearBulletsForOwner(this);
+
         // Big Explosion
         const emitter = this.scene.add.particles(this.x, this.y, 'particle', {
             speed: { min: 100, max: 300 },

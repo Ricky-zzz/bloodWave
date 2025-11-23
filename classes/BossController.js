@@ -6,8 +6,10 @@ export class BossController {
     constructor(scene) {
         this.scene = scene;
         this.gameTime = 0;
-        this.minionSpawned = false;
-        this.bossSpawned = false;
+        
+        // Track next spawn times instead of one-time flags
+        this.nextMinionSpawn = CONFIG.BOSS.MINION_TIME;
+        this.nextBossSpawn = CONFIG.BOSS.MAIN_TIME;
 
         // Controller for Red Bullets
         this.bulletController = new BossBulletController(scene);
@@ -22,17 +24,17 @@ export class BossController {
     update(time, delta) {
         this.gameTime += delta;
 
-        // Check Minion Spawn (40s)
-        if (!this.minionSpawned && this.gameTime > CONFIG.BOSS.MINION_TIME) {
+        // Check Minion Spawn (Interval)
+        if (this.gameTime > this.nextMinionSpawn) {
             this.spawnBoss(false); // isMain = false
-            this.minionSpawned = true;
+            this.nextMinionSpawn += CONFIG.BOSS.MINION_TIME;
             console.log("MINION SPAWNED");
         }
 
-        // Check Main Boss Spawn (90s)
-        if (!this.bossSpawned && this.gameTime > CONFIG.BOSS.MAIN_TIME) {
+        // Check Main Boss Spawn (Interval)
+        if (this.gameTime > this.nextBossSpawn) {
             this.spawnBoss(true); // isMain = true
-            this.bossSpawned = true;
+            this.nextBossSpawn += CONFIG.BOSS.MAIN_TIME;
             console.log("BOSS SPAWNED");
         }
     }
