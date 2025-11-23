@@ -14,6 +14,7 @@ export const GameState = {
         fireRate: CONFIG.WEAPON.FIRE_RATE,
         bulletDmg: CONFIG.WEAPON.BULLET_DMG,
         reloadSpeed: CONFIG.WEAPON.RELOAD_SPD,
+        reloadSpeed: CONFIG.WEAPON.RELOAD_SPD,
         ammo: CONFIG.WEAPON.AMMO,
     },
 
@@ -52,5 +53,11 @@ export const GameState = {
         nukeMaxCooldown: CONFIG.SKILLS.NUKE.COOLDOWN,
         nukeDmg: CONFIG.SKILLS.NUKE.DAMAGE,
         nukeRadius: CONFIG.SKILLS.NUKE.RADIUS,
+    },
+    enemies: {
+        spawnRate: CONFIG.ENEMIES.BASE_SPAWN_RATE,
+        enemey1Health: CONFIG.ENEMIES.TYPES[1].HP,
+        enemey1Speed: CONFIG.ENEMIES.TYPES[1].SPEED,
+        enemey1Damage: CONFIG.ENEMIES.TYPES[1].DMG,
     }
 };

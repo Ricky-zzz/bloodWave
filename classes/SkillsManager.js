@@ -105,8 +105,10 @@ export class SkillsManager {
             onComplete: () => explosion.destroy()
         });
 
-        console.log(`Grenade Boom: Radius ${radius}, Multiplier ${dmgMult}`);
-        // Later: Apply Damage = BaseDamage * dmgMult
+        const baseDmg = this.stats.getBulletDamage();
+        const totalDmg = baseDmg * dmgMult;
+        
+        this.scene.damageEnemiesInArea(x, y, radius, totalDmg);
     }
 
     useShield(timeNow) {
@@ -153,17 +155,22 @@ export class SkillsManager {
         return true;
     }
 
-    useNuke() {
+useNuke() {
         const s = this.state;
         if (s.nukeTimer > 0) return false;
 
+        // USE STAT: Cooldown
         s.nukeTimer = s.nukeMaxCooldown;
 
+        // Visuals
         this.scene.cameras.main.flash(4000, 255, 255, 255);
         this.scene.cameras.main.shake(1000, 0.1);
 
-        // USE STATS: Damage and Radius
-        console.log(`Nuke: Dmg ${s.nukeDmg}, Radius ${s.nukeRadius}`);
+        this.scene.events.emit('skill:nuke', { 
+            dmg: s.nukeDmg, 
+            radius: s.nukeRadius 
+        });
+        // -------------------
         return true;
     }
 }

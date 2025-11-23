@@ -1,10 +1,11 @@
 import { GameScene } from "./scenes/GameScene.js";
+import { UIScene } from "./scenes/UIScene.js";
 
 const config = {
     type: Phaser.AUTO,
     pixelArt: true,
     antialias: true,
-    scene: [GameScene],   
+    
     scale: {
         mode: Phaser.Scale.RESIZE,
         autoCenter: Phaser.Scale.CENTER_BOTH,
@@ -14,7 +15,8 @@ const config = {
         arcade: {
             debug: false,
         }
-    }
+    },
+    scene: [GameScene, UIScene] ,   
 };
 
 const game = new Phaser.Game(config);

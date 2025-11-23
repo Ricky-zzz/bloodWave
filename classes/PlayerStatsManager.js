@@ -13,6 +13,7 @@ export class PlayerStatsManager {
         this.state = GameState.player;
         this.config = CONFIG;
         this.fireRateMultiplier = 1.0;
+        this.lastHitTime = 0;
     }
 
     // re-initialize from CONFIG (useful on new run)
@@ -37,10 +38,28 @@ export class PlayerStatsManager {
 
     // damage/heal
     takeDamage(amount) {
-        // if shield active, ignore
+        const time = this.scene.time.now;
+
+        // 1. Check Shield
         if (GameState.skills.isShieldActive) return false;
+
+        // 2. Check Immunity Timer
+        if (time < this.lastHitTime + CONFIG.PLAYER.IMMUNITY_DURATION) return false;
+
+        // 3. Apply Damage
         this.state.hp = Math.max(0, this.state.hp - amount);
-        return this.state.hp <= 0;
+        this.lastHitTime = time;
+
+        // 4. Visual Feedback (Flash Alpha)
+        this.scene.tweens.add({
+            targets: this.scene.player,
+            alpha: 0.2,
+            yoyo: true,
+            repeat: 5,
+            duration: 100
+        });
+
+        return this.state.hp <= 0; // Returns true if dead
     }
 
     heal(amount) {
