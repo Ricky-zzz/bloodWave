@@ -14,11 +14,16 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.setVisible(true);
         this.setScale(1.5);
         this.clearTint();
+        this.stop(); 
 
         // Get Stats
         const stats = CONFIG.ENEMIES.TYPES[typeId];
         
         this.setTexture(stats.KEY);
+
+        if (typeId === 4) {
+            this.play('Enemy4');
+        }
 
         this.typeId = typeId;
         this.hp = stats.HP;
@@ -26,23 +31,28 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.moveSpeed = stats.SPEED;
         this.scoreValue = stats.SCORE;
 
-        // AI State for Heavy Enemy
         this.isCharging = false;
         this.chargeCooldown = 0;
+        
+        this.knockbackTimer = 0;
     }
 
     update(time, delta) {
         if (!this.active) return;
+
+        if (this.knockbackTimer > 0) {
+            this.knockbackTimer -= delta;
+            return;
+        }
 
         const player = this.scene.player;
         if (!player) return;
 
         const dist = Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y);
 
-        // --- TYPE 3: HEAVY CHARGER AI ---
         if (this.typeId === 3) {
             if (this.isCharging) {
-                // Currently dashing, ignore steering
+
                 return; 
             }
 
@@ -54,53 +64,51 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
             if (this.chargeCooldown > 0) this.chargeCooldown -= delta;
         }
 
-        // --- TYPE 4: EXPLODER AI ---
         if (this.typeId === 4) {
             if (dist < 50) {
-                this.explode(); // Self destruct if too close
+                this.explode(); 
                 return;
             }
         }
 
-        // --- STANDARD MOVEMENT (All types do this unless charging) ---
         this.scene.physics.moveToObject(this, player, this.moveSpeed);
         
-        // Sprite Flipping
         if (player.x < this.x) this.setFlipX(true);
         else this.setFlipX(false);
     }
 
+    receiveKnockback(vx, vy, duration) {
+        this.body.velocity.x += vx;
+        this.body.velocity.y += vy;
+        this.knockbackTimer = duration;
+    }
+
     startChargeAttack(player) {
         this.isCharging = true;
-        this.body.setVelocity(0); // Stop moving
-        this.setTint(0xff0000);   // Blink Red Warning
+        this.body.setVelocity(0); 
+        this.setTint(0xff0000);  
 
-        // 1. Charge Up (Wait 500ms)
         this.scene.time.delayedCall(500, () => {
             if (!this.active) return;
+
+            this.scene.physics.moveToObject(this, player, 500); 
             
-            // 2. Dash towards LAST KNOWN location
-            this.scene.physics.moveToObject(this, player, 500); // High speed dash
-            
-            // 3. Stop Dashing after 500ms
             this.scene.time.delayedCall(500, () => {
                 if (!this.active) return;
                 this.isCharging = false;
-                this.chargeCooldown = 3000; // Wait 3s before next charge
-                this.setTint(CONFIG.ENEMIES.TYPES[3].COLOR); // Restore Blue
+                this.chargeCooldown = 3000; 
+                this.setTint(CONFIG.ENEMIES.TYPES[3].COLOR); 
             });
         });
     }
 
     takeDamage(amount, skipDeathEffect = false) {
         this.hp -= amount;
-        
-        // Hit Flash
+
         this.setTintFill(0xffffff);
         this.scene.time.delayedCall(100, () => {
             if (!this.active) return;
             this.clearTint();
-            // Restore type color
             this.setTint(CONFIG.ENEMIES.TYPES[this.typeId].COLOR);
         });
 
@@ -112,14 +120,12 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     explode() {
         if (!this.active) return;
-        // Visual
         const explosion = this.scene.add.circle(this.x, this.y, 60, 0xff0000, 0.6);
         this.scene.tweens.add({ targets: explosion, scale: 2, alpha: 0, duration: 300, onComplete: () => explosion.destroy() });
         
-        // Damage Player if close
         const dist = Phaser.Math.Distance.Between(this.x, this.y, this.scene.player.x, this.scene.player.y);
         if (dist < 100) {
-            this.scene.stats.takeDamage(this.damage * 1.5); // Boom hurts more
+            this.scene.stats.takeDamage(this.damage * 1.5); 
         }
         
         this.die();

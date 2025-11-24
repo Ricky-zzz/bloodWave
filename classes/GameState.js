@@ -14,8 +14,11 @@ export const GameState = {
         fireRate: CONFIG.WEAPON.FIRE_RATE,
         bulletDmg: CONFIG.WEAPON.BULLET_DMG,
         reloadSpeed: CONFIG.WEAPON.RELOAD_SPD,
-        reloadSpeed: CONFIG.WEAPON.RELOAD_SPD,
+        maxAmmo: CONFIG.WEAPON.AMMO,
         ammo: CONFIG.WEAPON.AMMO,
+        bullletKnockback: CONFIG.WEAPON.BULLET_KNOCKBACK,
+        expCap: CONFIG.PLAYER.EXP_CAP,
+        exp: 0,
     },
 
     skills: {

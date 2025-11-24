@@ -1,5 +1,6 @@
 import { Bullet } from "./Bullet.js";
 import { CONFIG } from "./Config.js";
+import { GameState } from "./GameState.js";
 
 export class BulletController {
     constructor(scene,statsManager) {
@@ -46,20 +47,46 @@ export class BulletController {
     shoot(x, y, angle) {
         const time = this.scene.time.now;
         const currentFireRate = this.stats.getFireRate()
+        const isOverdrive = GameState.skills.isOverdriveActive;
+
+        // If Overdrive is active, ignore ammo check
+        if (!isOverdrive && this.stats.state.ammo <= 0) {
+            return "EMPTY";
+        }
 
         if (time > this.lastFired + currentFireRate) {
             
-            const bullet = this.bulletGroup.get();
+            const barrelLen = 65; 
+            const spawnX = x + Math.cos(angle) * barrelLen;
+            const spawnY = y + Math.sin(angle) * barrelLen - 5;
 
-            if (bullet) {                 
-                const barrelLen = 65; 
-                const spawnX = x + Math.cos(angle) * barrelLen;
-                const spawnY = y + Math.sin(angle) * barrelLen - 5;
+            if (isOverdrive) {
+                // Spread Shot: -15, 0, +15 degrees
+                const angles = [angle - 0.10, angle, angle + 0.10];
                 
-                bullet.fire(spawnX, spawnY, angle, CONFIG.WEAPON.BULLET_SPEED);              
-                
-                this.lastFired = time;
+                angles.forEach(a => {
+                    const bullet = this.bulletGroup.get();
+                    if (bullet) {
+                        bullet.fire(spawnX, spawnY, a, CONFIG.WEAPON.BULLET_SPEED);
+                    }
+                });
+            } else {
+                // Normal Shot
+                const bullet = this.bulletGroup.get();
+                if (bullet) {                 
+                    bullet.fire(spawnX, spawnY, angle, CONFIG.WEAPON.BULLET_SPEED);              
+                }
             }
+            
+            this.lastFired = time;
+            
+            // Only decrease ammo if NOT in Overdrive
+            if (!isOverdrive) {
+                this.stats.state.ammo--;
+            }
+            
+            return "FIRED";
         }
+        return "COOLDOWN";
     }
 }

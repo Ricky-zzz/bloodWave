@@ -19,4 +19,25 @@ export function createAnimations(scene) {
         frameRate: 12,
         repeat: -1
     });
+    scene.anims.create({
+        key: 'Enemy4',
+        frames: scene.anims.generateFrameNumbers('Enemy_4', { start: 0, end: 5 }),
+        frameRate: 15,
+        repeat: -1
+    });
+}
+
+export function createUIAnimations(scene) {
+    scene.anims.create({
+        key: 'heart_pulse',
+        frames: scene.anims.generateFrameNumbers('heart', { start: 0, end: 4 }),
+        frameRate: 15,
+        repeat: -1
+    });
+    scene.anims.create({
+        key: 'bullet_anims',
+        frames: scene.anims.generateFrameNumbers('bullet', { start: 0, end: 14 }),
+        frameRate: 15,
+        repeat: -1
+    });
 }

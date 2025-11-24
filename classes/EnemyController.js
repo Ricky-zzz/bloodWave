@@ -44,16 +44,14 @@ export class EnemyController {
             // 60% Type 1, 20% Type 2, 10% Type 3, 10% Type 4
             const rand = Math.random();
             let typeId = 1;
-            if (rand > 0.9) typeId = 4; // Exploder
-            else if (rand > 0.8) typeId = 3; // Heavy
-            else if (rand > 0.6) typeId = 2; // Fast
+            if (rand > 0.8) typeId = 4; 
+            else if (rand > 0.6) typeId = 3; 
+            else if (rand > 0.4) typeId = 2; 
 
-            // B. Calculate Spawn Position OUTSIDE camera
             const cam = this.scene.cameras.main;
-            const padding = 50; // Spawn slightly off screen
+            const padding = 20; 
             
             let x, y;
-            // Pick a random edge: 0=Top, 1=Right, 2=Bottom, 3=Left
             const edge = Phaser.Math.Between(0, 3);
 
             switch(edge) {

@@ -1,118 +1,132 @@
 import { GameState } from "../classes/GameState.js";
+import { createUIAnimations } from "../utils/animations.js";
 
 export class UIScene extends Phaser.Scene {
     constructor() {
         super({ key: 'UIScene' });
     }
 
+    preload() {
+        // KEYCAPS (bottom)
+        this.load.image('c_key', 'assets/imgs/stats/c.png');
+        this.load.image('q_key', 'assets/imgs/stats/q.png');
+        this.load.image('e_key', 'assets/imgs/stats/e.png');
+        this.load.image('z_key', 'assets/imgs/stats/z.png');
+
+        // SKILL ICONS (top)
+        this.load.image('grenade_icon', 'assets/imgs/stats/grenade.png');
+        this.load.image('shield_icon', 'assets/imgs/stats/shield.png');
+        this.load.image('power_icon', 'assets/imgs/stats/power.png');
+        this.load.image('nuke_icon', 'assets/imgs/stats/nuke.png');
+
+        // ANIMATED ICONS
+        this.load.spritesheet("heart", "assets/imgs/stats/heart.png", {
+            frameWidth: 48,
+            frameHeight: 48
+        });
+
+        this.load.spritesheet("bullet", "assets/imgs/stats/bullet.png", {
+            frameWidth: 48,
+            frameHeight: 48
+        });
+    }
+
     create() {
         const width = this.scale.width;
         const height = this.scale.height;
 
-        // --- 1. HP DISPLAY ONLY (NO BAR) ---
-        this.hpText = this.add.text(20, 20, "HP: 100", {
-            fontSize: "36px",
-            fontFamily: "Arial",
-            fontStyle: "bold",
-            color: "#ffffffff"
-        });
+        createUIAnimations(this);
 
-        // --- 2. SKILL UI SETUP ---
-        const baseY = height - 70;
-        const startX = 70;
-        const gap = 120;
+        // --- HEART + HP ---
+        this.heart = this.add.sprite(20, 20, "heart").setOrigin(0, 0).setScale(1.5);
+        this.heart.play("heart_pulse");
 
-        this.skillUI = {
-            Grenade: this.createSkillBox(startX, baseY, "C", "Grenade"),
-            Shield: this.createSkillBox(startX + gap, baseY, "Q", "Shield"),
-            Overdrive: this.createSkillBox(startX + gap * 2, baseY, "E", "Overdrive"),
-            Nuke: this.createSkillBox(startX + gap * 3, baseY, "Z", "Nuke")
-        };
-    }
-
-    // Creates one skill box
-    createSkillBox(x, y, key, name) {
-
-        const box = this.add.rectangle(x, y, 60, 60, 0x222222)
-            .setStrokeStyle(3, 0xffffff)
-            .setOrigin(0.5);
-
-        const insideText = this.add.text(x, y, key, {
+        this.hpText = this.add.text(100, 40, "100", {
             fontSize: "32px",
             fontFamily: "Arial",
             fontStyle: "bold",
             color: "#ffffff"
-        }).setOrigin(0.5);
+        });
 
-        const label = this.add.text(x, y + 45, name, {
-            fontSize: "18px",
+        // --- BULLET + AMMO ---
+        this.bulletIcon = this.add.sprite(20, 120, "bullet").setOrigin(0, 0).setScale(1.5);
+        this.bulletIcon.play("bullet_anims");
+
+        this.ammoText = this.add.text(100, 140, "30", {
+            fontSize: "32px",
             fontFamily: "Arial",
             fontStyle: "bold",
-            color: "#eeeeee"
-        }).setOrigin(0.5);
+            color: "#ffffff"
+        });
 
-        return { box, insideText, label, key };
+        // --- SKILLS (icon ABOVE keycap) ---
+        const baseY = height - 110;
+        const startX = 120;
+        const gap = 200;
+
+        this.skillUI = {
+            Grenade: this.createSkillSlot(startX, baseY, "grenade_icon", "c_key"),
+            Shield: this.createSkillSlot(startX + gap, baseY, "shield_icon", "q_key"),
+            Overdrive: this.createSkillSlot(startX + gap * 2, baseY, "power_icon", "e_key"),
+            Nuke: this.createSkillSlot(startX + gap * 3, baseY, "nuke_icon", "z_key")
+        };
     }
 
-update(time, delta) {
-    this.updateHP(time);
-    this.updateSkills();
-}
+    // Creates one skill icon above its keycap (icon on top, keycap below)
+    createSkillSlot(x, y, iconKey, keycapKey) {
+        // icon ABOVE
+        const skillImage = this.add.image(x, y-0, iconKey)
+            .setOrigin(0.5)
+            .setScale(1);
 
+        // keycap BELOW
+        const keyImage = this.add.image(x, y + 55, keycapKey)
+            .setOrigin(0.5)
+            .setScale(1);
 
-updateHP() {
-    const hp = GameState.player.hp;
-    this.hpText.setText(`HP: ${hp}`);
+        return { keyImage, skillImage };
+    }
 
-    // --- Moderate pulsing (same speed always) ---
-    const pulse = (Math.sin(this.time.now * 0.004) + 1) / 2; // smooth 0..1
+    update() {
+        this.updateHP();
+        this.updateAmmo();
+        this.updateSkills();
+    }
 
-    // Base + pulse colors (dark red → bright red)
-    const baseColor = 0x880000;
-    const pulseColor = 0xff0000;
+    updateHP() {
+        const hp = GameState.player.hp;
+        this.hpText.setText(hp);
+    }
 
-    const r = Phaser.Math.Interpolation.Linear([
-        (baseColor >> 16) & 255,
-        (pulseColor >> 16) & 255
-    ], pulse);
+    updateAmmo() {
+        const ammo = GameState.player.ammo;
+        this.ammoText.setText(ammo);
 
-    const g = Phaser.Math.Interpolation.Linear([
-        (baseColor >> 8) & 255,
-        (pulseColor >> 8) & 255
-    ], pulse);
-
-    const b = Phaser.Math.Interpolation.Linear([
-        baseColor & 255,
-        pulseColor & 255
-    ], pulse);
-
-    const finalColor = Phaser.Display.Color.GetColor(r, g, b);
-
-    this.hpText.setColor("#" + finalColor.toString(16));
-}
-
+        if (ammo <= 0) this.ammoText.setColor("#ff0000");
+        else if (ammo < GameState.player.maxAmmo * 0.3) this.ammoText.setColor("#ffff00");
+        else this.ammoText.setColor("#ffffff");
+    }
 
     updateSkills() {
         const skills = GameState.skills;
 
-        this.updateSkillDisplay("Grenade", skills.grenadeTimer);
-        this.updateSkillDisplay("Shield", skills.shieldTimer);
-        this.updateSkillDisplay("Overdrive", skills.overdriveTimer);
-        this.updateSkillDisplay("Nuke", skills.nukeTimer);
+        this.updateSkillCooldown("Grenade", skills.grenadeTimer);
+        this.updateSkillCooldown("Shield", skills.shieldTimer);
+        this.updateSkillCooldown("Overdrive", skills.overdriveTimer);
+        this.updateSkillCooldown("Nuke", skills.nukeTimer);
     }
 
-    updateSkillDisplay(name, timer) {
-        const ui = this.skillUI[name];
+    updateSkillCooldown(name, timer) {
+        const slot = this.skillUI[name];
 
-        if (!ui) return;
+        if (!slot) return;
 
         if (timer > 0) {
-            const sec = (timer / 1000).toFixed(1);
-            ui.insideText.setText(sec);
-            ui.insideText.setColor("#ff4444");
+            slot.skillImage.setAlpha(0.3);
+            slot.keyImage.setAlpha(0.3);
         } else {
-            ui.insideText.setText(ui.key);
-            ui.insideText.setColor("#ffffffff"); 
+            slot.skillImage.setAlpha(1);
+            slot.keyImage.setAlpha(1);
         }
     }
 }

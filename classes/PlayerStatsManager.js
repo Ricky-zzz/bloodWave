@@ -74,7 +74,6 @@ export class PlayerStatsManager {
     // permanent upgrades (called by level-up)
     applyBrutality() {
         this.state.bulletDmg += 2;
-        // faster fire: reduce delay by 10%
         this.state.fireRate = Math.max(20, Math.floor(this.state.fireRate * 0.9));
     }
     applyTactics() {
@@ -98,8 +97,6 @@ export class PlayerStatsManager {
     }
 
     activateShield(durationMs) {
-        // nothing to change in stats, shield logic checked where damage occurs
-        // but we can schedule an automatic end if desired
         this.scene.time.delayedCall(durationMs, () => {
             // SkillsManager will flip GameState.skills.isShieldActive = false
         });

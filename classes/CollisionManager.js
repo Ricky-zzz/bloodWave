@@ -1,4 +1,5 @@
 import { CONFIG } from "./Config.js";
+import { GameState } from "./GameState.js";
 
 export class CollisionManager {
     constructor(scene) {
@@ -12,7 +13,7 @@ export class CollisionManager {
         s.physics.add.overlap(s.bulletController.bulletGroup, s.enemyController.enemies, (bullet, enemy) => {
             if (enemy.active && bullet.active) {
                 bullet.disableBody(true, true);
-                this.applyKnockback(enemy, s.player.x, s.player.y, 100);
+                this.applyKnockback(enemy, s.player.x, s.player.y, GameState.player.bullletKnockback);
                 enemy.takeDamage(s.stats.getBulletDamage());
             }
         });
@@ -51,8 +52,15 @@ export class CollisionManager {
 
     applyKnockback(entity, sourceX, sourceY, force) {
         const angle = Phaser.Math.Angle.Between(sourceX, sourceY, entity.x, entity.y);
-        entity.body.velocity.x += Math.cos(angle) * force;
-        entity.body.velocity.y += Math.sin(angle) * force;
+        const vx = Math.cos(angle) * force;
+        const vy = Math.sin(angle) * force;
+
+        if (typeof entity.receiveKnockback === 'function') {
+            entity.receiveKnockback(vx, vy, 200);
+        } else {
+            entity.body.velocity.x += vx;
+            entity.body.velocity.y += vy;
+        }
     }
 
     handlePlayerHit(damage, sourceX, sourceY) {
