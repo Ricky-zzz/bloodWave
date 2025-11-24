@@ -1,4 +1,6 @@
 import { CONFIG } from "../classes/Config.js";
+import { SoundManager } from "../utils/SoundManager.js";
+import { GameState } from "./GameState.js";
 
 export class Enemy extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y) {
@@ -120,6 +122,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     explode() {
         if (!this.active) return;
+        SoundManager.play('explode');
         const explosion = this.scene.add.circle(this.x, this.y, 60, 0xff0000, 0.6);
         this.scene.tweens.add({ targets: explosion, scale: 2, alpha: 0, duration: 300, onComplete: () => explosion.destroy() });
         
@@ -136,8 +139,6 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.setVisible(false);
         this.body.stop();
 
-        // Particle Explosion
-        // Create an emitter at the enemy's position
         const emitter = this.scene.add.particles(this.x, this.y, 'particle', {
             speed: { min: 50, max: 200 },
             scale: { start: 1.5, end: 0 },
@@ -148,11 +149,11 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
         emitter.explode(15);
 
-        // Clean up the emitter after particles are gone
         this.scene.time.delayedCall(600, () => {
             emitter.destroy();
         });
 
-        // TODO: Spawn XP Gem here
+        GameState.score += this.scoreValue;
+        console.log('Score:', GameState.score);
     }
 }

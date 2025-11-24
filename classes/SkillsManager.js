@@ -1,5 +1,6 @@
 // src/classes/SkillsManager.js
 import { GameState } from "./GameState.js";
+import { SoundManager } from "../utils/SoundManager.js";
 
 export class SkillsManager {
     constructor(scene, statsManager, player) {
@@ -95,6 +96,7 @@ export class SkillsManager {
     triggerGrenadeExplosion(x, y, radius, dmgMult) {
         // Logic uses the passed stats
         const visualScale = radius / 10; 
+        SoundManager.play('explode');
 
         const explosion = this.scene.add.circle(x, y, 10, 0xffffff, 0.8);
         this.scene.tweens.add({
@@ -119,6 +121,7 @@ export class SkillsManager {
         s.shieldTimer = s.shieldMaxCooldown;
         
         s.isShieldActive = true;
+        SoundManager.play('shield');
         
         // USE STAT: Duration
         s._shieldEndTime = timeNow + s.shieldDuration;
@@ -141,6 +144,7 @@ export class SkillsManager {
         // USE STAT: Apply the multiplier (e.g., 0.5)
         // This sends the current upgrade level to PlayerStatsManager
         this.stats.startOverdrive(s.overdriveDuration, s.overdriveRateMult);
+        SoundManager.play('powerup');
 
         // Visual
         const burst = this.scene.add.circle(this.player.x, this.player.y, 50, 0xff0000, 0.5);
@@ -165,6 +169,7 @@ useNuke() {
         // Visuals
         this.scene.cameras.main.flash(4000, 255, 255, 255);
         this.scene.cameras.main.shake(1000, 0.1);
+        SoundManager.play('nuke');
 
         this.scene.events.emit('skill:nuke', { 
             dmg: s.nukeDmg, 

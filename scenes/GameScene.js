@@ -8,6 +8,7 @@ import { SkillsManager } from "../classes/SkillsManager.js";
 import { EffectsManager } from "../classes/EffectsManager.js"; 
 import { CollisionManager } from "../classes/CollisionManager.js"; 
 import { GameState } from "../classes/GameState.js";
+import { SoundManager } from "../utils/SoundManager.js";
 
 export class GameScene extends Phaser.Scene {
     constructor() { super({ key: 'GameScene' }); }
@@ -27,12 +28,29 @@ export class GameScene extends Phaser.Scene {
         this.load.spritesheet('Boss', 'assets/imgs/enemy/Boss.png', { frameWidth: 48, frameHeight: 48 });
 
         this.load.image('smg', 'assets/imgs/smg.png');
+        
+        this.load.audio('gamebgm', 'assets/sounds/battle.mp3');
+        this.load.audio('shoot', 'assets/sounds/shoot.mp3');
+        this.load.audio('reload', 'assets/sounds/reload.mp3');
+        this.load.audio('hurt', 'assets/sounds/hurt.mp3');
+        this.load.audio('damage', 'assets/sounds/damage.mp3');
+        this.load.audio('explode', 'assets/sounds/explode.mp3');
+        this.load.audio('shield', 'assets/sounds/shield.mp3');
+        this.load.audio('powerup', 'assets/sounds/powerup.mp3');
+        this.load.audio('nuke', 'assets/sounds/nuke.mp3');
     }
 
     create() {
+        SoundManager.init(this);
+        SoundManager.add('gamebgm', { loop: true, volume: 0.5 });
+        SoundManager.play('gamebgm');
+
         this.bg = this.add.tileSprite(0, 0, this.scale.width, this.scale.height, 'game_bg').setOrigin(0, 0).setScrollFactor(0);
         createAnimations(this);
         this.scene.launch('UIScene');
+        
+
+        
 
         // --- ENTITIES ---
         this.player = new Player(this, this.scale.width / 2, this.scale.height / 2);
@@ -110,6 +128,7 @@ export class GameScene extends Phaser.Scene {
             if (result === "EMPTY") {
                 this.startReload();
             }
+            
         }
 
         // Reload Input
@@ -128,6 +147,7 @@ export class GameScene extends Phaser.Scene {
 
     startReload() {
         this.isReloading = true;
+        SoundManager.play('reload');
         const reloadTime = GameState.player.reloadSpeed;
         
         this.time.delayedCall(reloadTime, () => {
@@ -163,9 +183,8 @@ export class GameScene extends Phaser.Scene {
     showGameOverScreen() {
         this.physics.pause();
         this.scene.stop('UIScene');
-        
-        const cam = this.cameras.main;
-        this.add.rectangle(cam.scrollX, cam.scrollY, cam.width, cam.height, 0x000000, 0.7).setOrigin(0,0);
-        this.add.text(cam.scrollX + cam.width/2, cam.scrollY + cam.height/2, "GAME OVER", { fontSize: '84px', fill: '#ff0000' }).setOrigin(0.5);
+    
+        SoundManager.stopAll(); 
+        this.scene.start('EndScene');
     }
 }

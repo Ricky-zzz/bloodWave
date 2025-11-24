@@ -1,5 +1,6 @@
 import { CONFIG } from "./Config.js";
 import { GameState } from "./GameState.js";
+import { SoundManager } from "../utils/SoundManager.js";
 
 export class CollisionManager {
     constructor(scene) {
@@ -15,6 +16,7 @@ export class CollisionManager {
                 bullet.disableBody(true, true);
                 this.applyKnockback(enemy, s.player.x, s.player.y, GameState.player.bullletKnockback);
                 enemy.takeDamage(s.stats.getBulletDamage());
+                SoundManager.play('damage');
             }
         });
 
@@ -33,6 +35,7 @@ export class CollisionManager {
             if (boss.active && bullet.active) {
                 bullet.disableBody(true, true);
                 boss.takeDamage(s.stats.getBulletDamage());
+                SoundManager.play('damage');
             }
         });
 

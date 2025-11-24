@@ -1,6 +1,7 @@
 // src/managers/PlayerStatsManager.js
 import { GameState } from "./GameState.js";
 import { CONFIG } from "./Config.js";
+import { SoundManager } from "../utils/SoundManager.js";
 
 /**
  * PlayerStatsManager
@@ -49,6 +50,7 @@ export class PlayerStatsManager {
         // 3. Apply Damage
         this.state.hp = Math.max(0, this.state.hp - amount);
         this.lastHitTime = time;
+        SoundManager.play('hurt');
 
         // 4. Visual Feedback (Flash Alpha)
         this.scene.tweens.add({

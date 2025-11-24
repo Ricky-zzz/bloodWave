@@ -70,12 +70,38 @@ export class UIScene extends Phaser.Scene {
             Overdrive: this.createSkillSlot(startX + gap * 2, baseY, "power_icon", "e_key"),
             Nuke: this.createSkillSlot(startX + gap * 3, baseY, "nuke_icon", "z_key")
         };
+
+        // --- SCORE + WAVE TEXT (top-right) ---
+        this.scoreText = this.add.text(
+            width - 40,   // right side
+            20,           // top margin
+            "Score: 0",
+            {
+                fontSize: "32px",
+                fontFamily: "Arial",
+                fontStyle: "bold",
+                color: "#ffffff"
+            }
+        ).setOrigin(1, 0); // anchor right side
+
+        this.waveText = this.add.text(
+            width - 40,
+            70,
+            "Wave: 1",
+            {
+                fontSize: "32px",
+                fontFamily: "Arial",
+                fontStyle: "bold",
+                color: "#ffffff"
+            }
+        ).setOrigin(1, 0);
+
     }
 
     // Creates one skill icon above its keycap (icon on top, keycap below)
     createSkillSlot(x, y, iconKey, keycapKey) {
         // icon ABOVE
-        const skillImage = this.add.image(x, y-0, iconKey)
+        const skillImage = this.add.image(x, y - 0, iconKey)
             .setOrigin(0.5)
             .setScale(1);
 
@@ -90,6 +116,9 @@ export class UIScene extends Phaser.Scene {
     update() {
         this.updateHP();
         this.updateAmmo();
+        this.scoreText.setText("Score: " + GameState.score);
+        this.waveText.setText("Wave: " + GameState.wave);
+
         this.updateSkills();
     }
 

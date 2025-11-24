@@ -1,6 +1,7 @@
 import { Bullet } from "./Bullet.js";
 import { CONFIG } from "./Config.js";
 import { GameState } from "./GameState.js";
+import { SoundManager } from "../utils/SoundManager.js";
 
 export class BulletController {
     constructor(scene,statsManager) {
@@ -62,7 +63,7 @@ export class BulletController {
 
             if (isOverdrive) {
                 // Spread Shot: -15, 0, +15 degrees
-                const angles = [angle - 0.10, angle, angle + 0.10];
+                const angles = [angle - 0.26, angle, angle + 0.26];
                 
                 angles.forEach(a => {
                     const bullet = this.bulletGroup.get();
@@ -70,11 +71,13 @@ export class BulletController {
                         bullet.fire(spawnX, spawnY, a, CONFIG.WEAPON.BULLET_SPEED);
                     }
                 });
+                SoundManager.play('shoot');
             } else {
                 // Normal Shot
                 const bullet = this.bulletGroup.get();
                 if (bullet) {                 
                     bullet.fire(spawnX, spawnY, angle, CONFIG.WEAPON.BULLET_SPEED);              
+                    SoundManager.play('shoot');
                 }
             }
             

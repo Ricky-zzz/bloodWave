@@ -1,5 +1,6 @@
 import { Enemy } from "./Enemy.js";
 import { CONFIG } from "./Config.js";
+import { GameState } from "./GameState.js";
 
 export class EnemyController {
     constructor(scene) {
@@ -27,7 +28,7 @@ export class EnemyController {
             this.difficultyTimer = 0;
             // Decrease spawn delay (faster spawns), clamp at minimum
             this.spawnDelay = Math.max(CONFIG.ENEMIES.MIN_SPAWN_RATE, this.spawnDelay * 0.9);
-            console.log("Wave Intensifies! Spawn Rate:", this.spawnDelay);
+            GameState.wave += 1;
         }
 
         // 2. Spawn Enemy

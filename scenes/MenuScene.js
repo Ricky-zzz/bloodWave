@@ -1,9 +1,11 @@
+import { SoundManager } from "../utils/SoundManager.js";
 export class MenuScene extends Phaser.Scene {
     constructor() {
         super({ key: 'MenuScene' });
     }
 
     preload() {
+        this.load.audio('menubgm', 'assets/sounds/menu.mp3');
         this.load.image('menu_bg', 'assets/imgs/menu.png');
         this.load.image('start_btn', 'assets/imgs/strtbg.png');
         this.load.image('ins_btn', 'assets/imgs/insbg.png');
@@ -12,6 +14,11 @@ export class MenuScene extends Phaser.Scene {
     }
 
     create() {
+
+        SoundManager.init(this);
+        SoundManager.add('menubgm', { loop: true, volume: 0.5 });
+        SoundManager.play('menubgm');
+
         const { width, height } = this.scale;
 
         this.add.image(width / 2, height / 2, "menu_bg").setOrigin(0.5).setDisplaySize(width, height);
@@ -28,6 +35,7 @@ export class MenuScene extends Phaser.Scene {
         });
 
         this.startBtn = this.createButton(width / 2, height / 2 + 80, "start_btn", () => {
+            SoundManager.stop('menubgm');
             this.scene.start("GameScene");
         });
         this.startBtn.setScale(2.5);
@@ -68,7 +76,7 @@ export class MenuScene extends Phaser.Scene {
         const { width, height } = this.scale;
 
         const overlay = this.add.rectangle(0, 0, width * 2, height * 2, 0x000000, 0.7).setOrigin(0).setInteractive();
-        const panel = this.add.image(width / 2, height / 2, "ins").setOrigin(0.5).setScale(1.8);    
+        const panel = this.add.image(width / 2, height / 2, "ins").setOrigin(0.5).setScale(1.8);
         overlay.once("pointerdown", () => {
             overlay.destroy();
             panel.destroy();
