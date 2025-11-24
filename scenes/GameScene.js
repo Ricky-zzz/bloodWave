@@ -85,6 +85,37 @@ export class GameScene extends Phaser.Scene {
             this.effects.playNukeEffect();
             this.collisions.damageEnemiesInArea(this.player.x, this.player.y, radius, dmg, false, true);
         });
+
+        this.createVignette();
+    }
+
+    createVignette() {
+        this.shadow = this.add.rectangle(0, 0, this.scale.width, this.scale.height, 0x000000, 0.95).setOrigin(0).setScrollFactor(0).setDepth(9);
+
+        if (!this.textures.exists('vision')) {
+            const radius = 1000;
+            const texture = this.textures.createCanvas('vision', radius * 2, radius * 2);
+            const ctx = texture.context;
+            
+            const grd = ctx.createRadialGradient(radius, radius, 0, radius, radius, radius);
+            grd.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            grd.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            
+            ctx.fillStyle = grd;
+            ctx.fillRect(0, 0, radius * 2, radius * 2);
+            texture.refresh();
+        }
+
+        this.visionSprite = this.make.image({
+            x: this.player.x,
+            y: this.player.y,
+            key: 'vision',
+            add: false
+        });
+        
+        const mask = new Phaser.Display.Masks.BitmapMask(this, this.visionSprite);
+        mask.invertAlpha = true;
+        this.shadow.setMask(mask);
     }
 
     setupInputs() {
@@ -97,6 +128,11 @@ export class GameScene extends Phaser.Scene {
 
     update(time, delta) {
         if (GameState.isPaused) return;
+
+        if (this.visionSprite) {
+            this.visionSprite.x = this.player.x;
+            this.visionSprite.y = this.player.y;
+        }
 
         this.player.update();
         this.skills.update(time, delta);
@@ -163,8 +199,6 @@ export class GameScene extends Phaser.Scene {
     }
 
     damageEnemiesInArea(x, y, radius, damage) {
-        // Delegate to CollisionManager
-        // Grenades use this: Affect Bosses = true, Skip Death Effect = false
         this.collisions.damageEnemiesInArea(x, y, radius, damage, true, false);
     }
 

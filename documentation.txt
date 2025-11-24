@@ -1,0 +1,200 @@
+BLOODWAVE PROJECT DOCUMENTATION
+==============================
+
+1. PROJECT STRUCTURE & FILE DESCRIPTIONS
+========================================
+
+ROOT DIRECTORY
+--------------
+- index.html: The HTML entry point that loads the game script.
+- main.js: The main entry point for the JavaScript code. Initializes the Phaser.Game instance with configuration (physics, scaling, scenes).
+- phaser.js: The Phaser 3 library file.
+- style.css: Basic CSS for the game container.
+
+CLASSES (src/classes/)
+----------------------
+- Boss.js: 
+  - Defines the Boss entity (extends Phaser.Physics.Arcade.Sprite).
+  - Handles boss AI: movement, teleportation logic, and attack patterns (aimed shots, spin attacks).
+  - Differentiates between "Minion" and "Main" bosses based on stats.
+
+- BossBulletController.js:
+  - Manages the pool of bullets fired by bosses.
+  - Handles creating bullet textures and firing logic.
+
+- BossController.js:
+  - Manages the spawning lifecycle of bosses.
+  - Tracks time to spawn Minion vs Main bosses based on configuration.
+
+- Bullet.js:
+  - Defines a generic Bullet entity (extends Phaser.Physics.Arcade.Sprite).
+  - Handles bullet movement (velocity from rotation) and automatic cleanup (lifetime/off-screen).
+
+- BulletController.js:
+  - Manages the player's bullet pool.
+  - Handles shooting logic: fire rate checks, ammo consumption, and special firing modes (e.g., Overdrive spread shot).
+
+- CollisionManager.js:
+  - Centralizes all physics collision and overlap logic.
+  - Handles interactions: Bullet vs Enemy, Player vs Enemy, Bullet vs Boss, etc.
+  - Applies damage and knockback effects.
+
+- Config.js:
+  - A central configuration object containing game constants.
+  - Stores stats for Player, Weapons, Skills, Enemies, and Bosses.
+
+- EffectsManager.js:
+  - Manages visual effects.
+  - Creates particle emitters for death explosions.
+  - Handles camera effects like shake and flash (for Nuke).
+
+- Enemy.js:
+  - Defines the Enemy entity (extends Phaser.Physics.Arcade.Sprite).
+  - Handles Enemy AI types: Standard chaser, Heavy charger, Exploder.
+  - Manages health, taking damage, and death sequences.
+
+- EnemyController.js:
+  - Manages the spawning of regular enemies.
+  - Handles wave difficulty progression (increasing spawn rates over time).
+  - Spawns enemies at the edges of the camera view.
+
+- GameState.js:
+  - A global state object (Singleton-like pattern).
+  - Stores runtime data: Player HP, Ammo, Score, Wave number.
+  - Stores Skill states: Cooldown timers, active duration flags.
+
+- Player.js:
+  - Defines the Player entity (extends Phaser.Physics.Arcade.Sprite).
+  - Handles WASD movement logic, velocity normalization, and sprite flipping.
+  - Manages player animations (Idle, Run, Walk).
+
+- PlayerStatsManager.js:
+  - Encapsulates logic for modifying player stats.
+  - Handles taking damage (immunity frames, shield check), healing, and applying upgrades.
+
+- SkillsManager.js:
+  - Manages the logic for player skills: Grenade, Shield, Overdrive, Nuke.
+  - Handles cooldown timers, active durations, and visual indicators (e.g., Shield graphic).
+
+SCENES (src/scenes/)
+--------------------
+- GameScene.js:
+  - The core gameplay loop.
+  - Initializes all entities (Player, Managers, Controllers).
+  - Handles input mapping (WASD, Mouse, Skills).
+  - Implements the "Vignette" (fog of war) visual effect.
+  - Updates all sub-systems in the game loop.
+
+- MenuScene.js:
+  - The starting screen.
+  - Displays title, background, and "Start Game" button.
+  - Handles background music playback.
+
+- UIScene.js:
+  - A separate scene running in parallel (overlay) for the HUD.
+  - Displays Player HP, Ammo count, and Skill cooldown timers.
+  - Handles UI animations (pulsing heart, bullet icon).
+
+UTILS (src/utils/)
+------------------
+- animations.js:
+  - Contains helper functions to define Phaser animations.
+  - `createAnimations`: For game entities (Player, Enemies).
+  - `createUIAnimations`: For UI elements (Heart, Bullet).
+
+- SoundManager.js:
+  - A static utility class for managing audio.
+  - Handles playing BGM (background music) and SFX (sound effects).
+  - Provides a centralized way to play, stop, and manage sounds.
+
+2. PHASER METHODS USED
+======================
+
+Scene & Game Management
+-----------------------
+- new Phaser.Game(config)
+- scene.start(key)
+- scene.launch(key)
+- scene.stop(key)
+- scene.add.existing(gameObject)
+
+Loader (preload)
+----------------
+- this.load.image(key, path)
+- this.load.spritesheet(key, path, config)
+- this.load.audio(key, path)
+
+Factory / Game Objects (create)
+-------------------------------
+- this.add.image(x, y, key)
+- this.add.sprite(x, y, key)
+- this.add.text(x, y, text, style)
+- this.add.rectangle(x, y, w, h, color, alpha)
+- this.add.circle(x, y, radius, color, alpha)
+- this.add.graphics()
+- this.add.tileSprite(x, y, w, h, key)
+- this.add.particles(x, y, texture, config)
+- this.make.image(config)
+- this.make.graphics(config)
+
+Physics (Arcade)
+----------------
+- this.physics.add.existing(gameObject)
+- this.physics.add.group(config)
+- this.physics.add.overlap(object1, object2, callback)
+- this.physics.add.collider(object1, object2, callback)
+- this.physics.moveToObject(source, target, speed)
+- this.physics.velocityFromRotation(angle, speed, vec2)
+- body.setVelocity(x, y)
+- body.setCircle(radius)
+- body.setDrag(value)
+- body.reset(x, y)
+
+Input
+-----
+- this.input.keyboard.addKey(keyCode)
+- this.input.keyboard.addKeys(string)
+- this.input.on(event, callback)
+- this.input.activePointer
+- Phaser.Input.Keyboard.JustDown(key)
+
+Animation
+---------
+- this.anims.create(config)
+- this.anims.generateFrameNumbers(key, config)
+- sprite.play(key, ignoreIfPlaying)
+
+Tweens & Time
+-------------
+- this.tweens.add(config)
+- this.time.delayedCall(delay, callback)
+- this.time.now
+
+Camera
+------
+- this.cameras.main.startFollow(target)
+- this.cameras.main.flash(duration, r, g, b)
+- this.cameras.main.shake(duration, intensity)
+- this.cameras.main.worldView.contains(x, y)
+
+Sound
+-----
+- this.sound.add(key, config)
+- this.sound.play(key, config)
+- sound.play()
+- sound.stop()
+
+Math & Geometry
+---------------
+- Phaser.Math.Angle.Between(x1, y1, x2, y2)
+- Phaser.Math.Distance.Between(x1, y1, x2, y2)
+- Phaser.Math.Between(min, max)
+- Phaser.Math.Interpolation.Linear(values, t)
+- Phaser.Display.Color.GetColor(r, g, b)
+
+Textures & Rendering
+--------------------
+- this.textures.exists(key)
+- this.textures.createCanvas(key, w, h)
+- graphics.generateTexture(key, w, h)
+- Phaser.Display.Masks.BitmapMask(scene, source)
