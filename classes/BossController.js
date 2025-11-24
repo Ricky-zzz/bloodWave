@@ -7,14 +7,10 @@ export class BossController {
         this.scene = scene;
         this.gameTime = 0;
         
-        // Track next spawn times instead of one-time flags
         this.nextMinionSpawn = CONFIG.BOSS.MINION_TIME;
         this.nextBossSpawn = CONFIG.BOSS.MAIN_TIME;
-
-        // Controller for Red Bullets
         this.bulletController = new BossBulletController(scene);
 
-        // Group for Bosses
         this.bossGroup = this.scene.physics.add.group({
             classType: Boss,
             runChildUpdate: true
@@ -24,14 +20,12 @@ export class BossController {
     update(time, delta) {
         this.gameTime += delta;
 
-        // Check Minion Spawn (Interval)
         if (this.gameTime > this.nextMinionSpawn) {
             this.spawnBoss(false); // isMain = false
             this.nextMinionSpawn += CONFIG.BOSS.MINION_TIME;
             console.log("MINION SPAWNED");
         }
 
-        // Check Main Boss Spawn (Interval)
         if (this.gameTime > this.nextBossSpawn) {
             this.spawnBoss(true); // isMain = true
             this.nextBossSpawn += CONFIG.BOSS.MAIN_TIME;
@@ -40,12 +34,10 @@ export class BossController {
     }
 
     spawnBoss(isMain) {
-        // Spawn slightly off screen top
         const cam = this.scene.cameras.main;
         const x = cam.scrollX + cam.width / 2;
         const y = cam.scrollY - 100;
 
-        // Create specific instance manually passing the bullet controller
         const boss = new Boss(this.scene, this.bulletController);
         this.bossGroup.add(boss);
         boss.spawn(x, y, isMain);

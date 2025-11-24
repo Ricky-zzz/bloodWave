@@ -8,9 +8,9 @@ export class CollisionManager {
     }
 
     setup() {
-        const s = this.scene; // Short reference
+        const s = this.scene; 
 
-        // 1. Bullet vs Enemy
+        // B v E
         s.physics.add.overlap(s.bulletController.bulletGroup, s.enemyController.enemies, (bullet, enemy) => {
             if (enemy.active && bullet.active) {
                 bullet.disableBody(true, true);
@@ -20,7 +20,7 @@ export class CollisionManager {
             }
         });
 
-        // 2. Enemy vs Player
+        //E v P
         s.physics.add.collider(s.player, s.enemyController.enemies, (player, enemy) => {
             this.handlePlayerHit(enemy.damage, enemy.x, enemy.y);
             if (enemy.active) {
@@ -30,7 +30,7 @@ export class CollisionManager {
             }
         });
 
-        // 3. Bullet vs Boss
+        // b vs B
         s.physics.add.overlap(s.bulletController.bulletGroup, s.bossController.bossGroup, (bullet, boss) => {
             if (boss.active && bullet.active) {
                 bullet.disableBody(true, true);
@@ -39,12 +39,12 @@ export class CollisionManager {
             }
         });
 
-        // 4. Boss Body vs Player
+        // 4.B v P
         s.physics.add.collider(s.player, s.bossController.bossGroup, (player, boss) => {
             this.handlePlayerHit(boss.damage, boss.x, boss.y);
         });
 
-        // 5. Boss Bullet vs Player
+        // 5. Bbullet vs P
         s.physics.add.overlap(s.player, s.bossController.bulletController.bulletGroup, (player, bullet) => {
             if (bullet.active) {
                 bullet.disableBody(true, true);
@@ -73,7 +73,6 @@ export class CollisionManager {
         const prevHp = s.stats.state.hp;
         const isDead = s.stats.takeDamage(damage);
 
-        // Apply Player Knockback if damage taken
         if (s.stats.state.hp < prevHp) {
             const angle = Phaser.Math.Angle.Between(sourceX, sourceY, s.player.x, s.player.y);
             const force = CONFIG.PLAYER.KNOCKBACK_FORCE;
@@ -84,7 +83,6 @@ export class CollisionManager {
     }
 
     damageEnemiesInArea(x, y, radius, damage, affectBosses = true, skipDeathEffect = false) {
-        // Hit Regular Enemies
         const enemies = this.scene.enemyController.enemies.getChildren();
         enemies.forEach(enemy => {
             if (enemy.active && Phaser.Math.Distance.Between(x, y, enemy.x, enemy.y) <= radius) {
@@ -92,7 +90,6 @@ export class CollisionManager {
             }
         });
 
-        // Hit Bosses
         if (affectBosses) {
             const bosses = this.scene.bossController.bossGroup.getChildren();
             bosses.forEach(boss => {

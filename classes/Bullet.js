@@ -18,7 +18,6 @@ export class Bullet extends Phaser.Physics.Arcade.Sprite {
     }
 
     update(time, delta) {
-        // Cull when off-screen
         if (!this.scene.cameras.main.worldView.contains(this.x, this.y)) {
             this.disableBody(true, true);
             return;

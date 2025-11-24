@@ -15,7 +15,6 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
         this.body.reset(x, y);
         this.setCircle(20); 
         
-        // Load Stats
         const stats = isMainBoss ? CONFIG.BOSS.MAIN : CONFIG.BOSS.MINION;
         
         this.setTexture(stats.KEY);
@@ -71,7 +70,6 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     }
 
     fireSpinAttack() {
-        // Fire 8 bullets in a circle
         for (let i = 0; i < 8; i++) {
             const angle = this.rotation + (i * (Math.PI / 4)); 
             this.bulletController.fireBullet(this.x, this.y, angle, this.bulletSpeed * 0.8, this.damage, this);
@@ -112,12 +110,9 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     die() {
         this.setActive(false);
         this.setVisible(false);
-        this.body.stop();
-        
-        // Clear bullets fired by this boss
+        this.body.stop();    
         this.bulletController.clearBulletsForOwner(this);
 
-        // Big Explosion
         const emitter = this.scene.add.particles(this.x, this.y, 'particle', {
             speed: { min: 100, max: 300 },
             scale: { start: 4, end: 0 },
@@ -127,7 +122,5 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
             tint: 0xff0000
         });
         emitter.explode(50);
-        
-        // TODO: Drop Mega XP Gem
     }
 }

@@ -3,11 +3,6 @@ import { GameState } from "./GameState.js";
 import { CONFIG } from "./Config.js";
 import { SoundManager } from "../utils/SoundManager.js";
 
-/**
- * PlayerStatsManager
- * - centralizes reads/writes to GameState.player
- * - applies temporary/permanent modifications safely
- */
 export class PlayerStatsManager {
     constructor(scene) {
         this.scene = scene;
@@ -16,8 +11,6 @@ export class PlayerStatsManager {
         this.fireRateMultiplier = 1.0;
         this.lastHitTime = 0;
     }
-
-    // re-initialize from CONFIG (useful on new run)
     resetFromConfig() {
         this.state.maxHP = this.config.PLAYER.HEALTH;
         this.state.hp = this.state.maxHP;
@@ -29,30 +22,22 @@ export class PlayerStatsManager {
         this.state.ammo = this.config.WEAPON.AMMO;
     }
 
-    // getters used by other systems
     getSpeed() { return this.state.speed; }
     getRunSpeed() { return this.state.runSpeed; }
-    getFireRate() { // current effective fire rate (ms)
+    getFireRate() { 
         return this.state.fireRate * this.fireRateMultiplier;
     }
     getBulletDamage() { return this.state.bulletDmg; }
 
-    // damage/heal
     takeDamage(amount) {
         const time = this.scene.time.now;
 
-        // 1. Check Shield
         if (GameState.skills.isShieldActive) return false;
-
-        // 2. Check Immunity Timer
         if (time < this.lastHitTime + CONFIG.PLAYER.IMMUNITY_DURATION) return false;
-
-        // 3. Apply Damage
         this.state.hp = Math.max(0, this.state.hp - amount);
         this.lastHitTime = time;
         SoundManager.play('hurt');
 
-        // 4. Visual Feedback (Flash Alpha)
         this.scene.tweens.add({
             targets: this.scene.player,
             alpha: 0.2,
@@ -61,7 +46,7 @@ export class PlayerStatsManager {
             duration: 100
         });
 
-        return this.state.hp <= 0; // Returns true if dead
+        return this.state.hp <= 0; 
     }
 
     heal(amount) {
@@ -73,7 +58,6 @@ export class PlayerStatsManager {
         if (alsoHeal) this.state.hp = this.state.maxHP;
     }
 
-    // permanent upgrades (called by level-up)
     applyBrutality() {
         this.state.bulletDmg += 2;
         this.state.fireRate = Math.max(20, Math.floor(this.state.fireRate * 0.9));
@@ -87,12 +71,9 @@ export class PlayerStatsManager {
         this.addMaxHP(20, true);
     }
 
-    // temporary buffs from skills
     startOverdrive(durationMs, multiplier = 0.5) {
-        // Set the multiplier (0.5 means firing twice as fast)
         this.fireRateMultiplier = multiplier;
         
-        // Schedule revert back to 1.0
         this.scene.time.delayedCall(durationMs, () => {
             this.fireRateMultiplier = 1.0;
         });
@@ -100,7 +81,6 @@ export class PlayerStatsManager {
 
     activateShield(durationMs) {
         this.scene.time.delayedCall(durationMs, () => {
-            // SkillsManager will flip GameState.skills.isShieldActive = false
         });
     }
 }

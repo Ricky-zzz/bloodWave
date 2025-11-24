@@ -49,21 +49,15 @@ export class GameScene extends Phaser.Scene {
         createAnimations(this);
         this.scene.launch('UIScene');
         
-
-        
-
-        // --- ENTITIES ---
+        // Modules
         this.player = new Player(this, this.scale.width / 2, this.scale.height / 2);
         this.add.existing(this.player);
         this.physics.add.existing(this.player);
         this.player.setCollideWorldBounds(false); 
         this.player.setScale(1.7);
         this.player.body.setCircle(15, 10, 10); 
-        
         this.smg = this.add.sprite(this.player.x, this.player.y, 'smg').setOrigin(0.1, 0.5).setScale(0.8);
         this.isReloading = false;
-
-        // --- MANAGERS ---
         this.effects = new EffectsManager(this); 
         this.stats = new PlayerStatsManager(this);
         this.stats.resetFromConfig();
@@ -71,21 +65,14 @@ export class GameScene extends Phaser.Scene {
         this.enemyController = new EnemyController(this);
         this.bossController = new BossController(this); 
         this.bulletController = new BulletController(this, this.stats);
-        
-        // --- COLLISIONS ---
         this.collisions = new CollisionManager(this);
         this.collisions.setup(); 
-
-        // --- INPUTS & CAMERA ---
         this.setupInputs();
         this.cameras.main.startFollow(this.player);
-
-        // --- EVENT LISTENERS ---
         this.events.on('skill:nuke', ({ dmg, radius }) => {
             this.effects.playNukeEffect();
             this.collisions.damageEnemiesInArea(this.player.x, this.player.y, radius, dmg, false, true);
         });
-
         this.createVignette();
     }
 
@@ -142,7 +129,6 @@ export class GameScene extends Phaser.Scene {
         this.bg.tilePositionX = this.cameras.main.scrollX;
         this.bg.tilePositionY = this.cameras.main.scrollY;
 
-        // --- Weapon Logic ---
         const pointer = this.input.activePointer;
         const aimAngle = Phaser.Math.Angle.Between(this.player.x, this.player.y, pointer.worldX, pointer.worldY);
         const radius = 20;
@@ -158,23 +144,17 @@ export class GameScene extends Phaser.Scene {
             this.smg.flipY = (aimAngle > Math.PI / 2 || aimAngle < -Math.PI / 2);
         }
 
-        // Shooting
         if (this.input.activePointer.isDown && !this.isReloading) {
             const result = this.bulletController.shoot(this.smg.x, this.smg.y, this.smg.rotation);
             if (result === "EMPTY") {
                 this.startReload();
-            }
-            
+            }   
         }
-
-        // Reload Input
         if (Phaser.Input.Keyboard.JustDown(this.keyR) && !this.isReloading) {
             if (GameState.player.ammo < GameState.player.maxAmmo) {
                 this.startReload();
             }
         }
-
-        // Skills
         if (Phaser.Input.Keyboard.JustDown(this.keyC)) this.skills.useGrenade();
         if (Phaser.Input.Keyboard.JustDown(this.keyQ)) this.skills.useShield(time);
         if (Phaser.Input.Keyboard.JustDown(this.keyE)) this.skills.useOverdrive(time);
@@ -189,8 +169,6 @@ export class GameScene extends Phaser.Scene {
         this.time.delayedCall(reloadTime, () => {
             GameState.player.ammo = GameState.player.maxAmmo;
             this.isReloading = false;
-            
-            // Reset rotation to face mouse immediately
             const pointer = this.input.activePointer;
             const angle = Phaser.Math.Angle.Between(this.player.x, this.player.y, pointer.worldX, pointer.worldY);
             this.smg.rotation = angle;

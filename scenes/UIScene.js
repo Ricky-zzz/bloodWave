@@ -7,19 +7,14 @@ export class UIScene extends Phaser.Scene {
     }
 
     preload() {
-        // KEYCAPS (bottom)
         this.load.image('c_key', 'assets/imgs/stats/c.png');
         this.load.image('q_key', 'assets/imgs/stats/q.png');
         this.load.image('e_key', 'assets/imgs/stats/e.png');
         this.load.image('z_key', 'assets/imgs/stats/z.png');
-
-        // SKILL ICONS (top)
         this.load.image('grenade_icon', 'assets/imgs/stats/grenade.png');
         this.load.image('shield_icon', 'assets/imgs/stats/shield.png');
         this.load.image('power_icon', 'assets/imgs/stats/power.png');
         this.load.image('nuke_icon', 'assets/imgs/stats/nuke.png');
-
-        // ANIMATED ICONS
         this.load.spritesheet("heart", "assets/imgs/stats/heart.png", {
             frameWidth: 48,
             frameHeight: 48
@@ -37,10 +32,9 @@ export class UIScene extends Phaser.Scene {
 
         createUIAnimations(this);
 
-        // --- HEART + HP ---
+        // heart 
         this.heart = this.add.sprite(20, 20, "heart").setOrigin(0, 0).setScale(1.5);
         this.heart.play("heart_pulse");
-
         this.hpText = this.add.text(100, 40, "100", {
             fontSize: "32px",
             fontFamily: "Arial",
@@ -48,7 +42,7 @@ export class UIScene extends Phaser.Scene {
             color: "#ffffff"
         });
 
-        // --- BULLET + AMMO ---
+        // bullet
         this.bulletIcon = this.add.sprite(20, 120, "bullet").setOrigin(0, 0).setScale(1.5);
         this.bulletIcon.play("bullet_anims");
 
@@ -71,10 +65,9 @@ export class UIScene extends Phaser.Scene {
             Nuke: this.createSkillSlot(startX + gap * 3, baseY, "nuke_icon", "z_key")
         };
 
-        // --- SCORE + WAVE TEXT (top-right) ---
         this.scoreText = this.add.text(
-            width - 40,   // right side
-            20,           // top margin
+            width - 40,   
+            20,           
             "Score: 0",
             {
                 fontSize: "32px",
@@ -82,7 +75,7 @@ export class UIScene extends Phaser.Scene {
                 fontStyle: "bold",
                 color: "#ffffff"
             }
-        ).setOrigin(1, 0); // anchor right side
+        ).setOrigin(1, 0); 
 
         this.waveText = this.add.text(
             width - 40,
@@ -98,18 +91,15 @@ export class UIScene extends Phaser.Scene {
 
     }
 
-    // Creates one skill icon above its keycap (icon on top, keycap below)
+
     createSkillSlot(x, y, iconKey, keycapKey) {
-        // icon ABOVE
         const skillImage = this.add.image(x, y - 0, iconKey)
             .setOrigin(0.5)
             .setScale(1);
 
-        // keycap BELOW
         const keyImage = this.add.image(x, y + 55, keycapKey)
             .setOrigin(0.5)
             .setScale(1);
-
         return { keyImage, skillImage };
     }
 
@@ -118,7 +108,6 @@ export class UIScene extends Phaser.Scene {
         this.updateAmmo();
         this.scoreText.setText("Score: " + GameState.score);
         this.waveText.setText("Wave: " + GameState.wave);
-
         this.updateSkills();
     }
 

@@ -26,7 +26,6 @@ export class BossBulletController {
         if (bullet) {
             bullet.owner = owner;
             bullet.setTexture('boss_bullet');
-            // Pass 3000ms lifetime for boss bullets
             bullet.fire(x, y, angle, speed, damage, 3000);
         }
     }
@@ -36,7 +35,6 @@ export class BossBulletController {
             if (bullet.active && bullet.owner === owner) {
                 bullet.disableBody(true, true);
                 
-                // Optional: Add a small vanish effect
                 if (this.scene.textures.exists('particle')) {
                     const emitter = this.scene.add.particles(bullet.x, bullet.y, 'particle', {
                         speed: 50,

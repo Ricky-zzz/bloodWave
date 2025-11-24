@@ -7,7 +7,7 @@ import { EndScene } from "./scenes/EndScene.js";
 const config = {
     type: Phaser.AUTO,
     pixelArt: true,
-    antialias: true,
+    antialias: false,
 
     scale: {
         mode: Phaser.Scale.RESIZE,
