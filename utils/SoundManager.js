@@ -17,14 +17,16 @@ export class SoundManager {
         if (!this.enabled) return;
 
         if (this.sounds[key]) {
-            if (!this.sounds[key].isPlaying || config.forceRestart) {
-                this.sounds[key].play(config);
+            const sound = this.sounds[key];
+
+            if (!sound.isPlaying || config.forceRestart) {
+                sound.play(config);
             }
             return;
         }
 
         if (this.scene && this.scene.sound) {
-             this.scene.sound.play(key, config);
+            this.scene.sound.play(key, config);
         }
     }
 
@@ -35,6 +37,28 @@ export class SoundManager {
     }
 
     static stopAll() {
-        this.scene.sound.stopAll();
+        if (this.scene && this.scene.sound) {
+            this.scene.sound.stopAll();
+        }
+    }
+
+    static setVolume(key, volume) {
+        if (this.sounds[key]) {
+            this.sounds[key].setVolume(volume);
+        }
+    }
+
+    static getVolume(key) {
+        return this.sounds[key]?.volume ?? null;
+    }
+
+    static setGlobalVolume(volume) {
+        if (this.scene && this.scene.sound) {
+            this.scene.sound.volume = volume; 
+        }
+    }
+
+    static getGlobalVolume() {
+        return this.scene?.sound?.volume ?? null;
     }
 }

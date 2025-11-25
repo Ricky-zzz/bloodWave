@@ -1,9 +1,9 @@
-// src/classes/GameState.js
 import { CONFIG } from "./Config.js";
 
 export const GameState = {
     score: 0,
     wave: 1,
+    seconds: 0,
     isPaused: false,
 
     player: {

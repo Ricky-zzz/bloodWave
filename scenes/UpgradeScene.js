@@ -1,4 +1,3 @@
-// tutuloy pag may time pag wla edi
 export class UpgradeScene extends Phaser.Scene {
     constructor() {
         super({ key: 'UpgradeScene' });
@@ -11,11 +10,13 @@ export class UpgradeScene extends Phaser.Scene {
     }
 
     create() {
-        const { width, height } = this.scale;
 
-        const redUpgrade = this.add.image(width / 2 - 500, height / 2, 'red').setOrigin(0.5).setScale(1.1);
-        const blueUpgrade = this.add.image(width / 2, height / 2, 'blue').setOrigin(0.5).setScale(1.1);
-        const greenUpgrade = this.add.image(width / 2 + 500, height / 2, 'green').setOrigin(0.5).setScale(1.1);
+        const { width, height } = this.scale;
+        const scaleFactor = Math.min(width / 1920, height / 1080);
+
+        const redUpgrade = this.add.image(width / 2 - 500 * scaleFactor, height / 2, 'red').setOrigin(0.5).setScale(1.1 * scaleFactor);
+        const blueUpgrade = this.add.image(width / 2, height / 2, 'blue').setOrigin(0.5).setScale(1.1 * scaleFactor);
+        const greenUpgrade = this.add.image(width / 2 + 500 * scaleFactor, height / 2, 'green').setOrigin(0.5).setScale(1.1 * scaleFactor);
 
         const upgrades = [redUpgrade, blueUpgrade, greenUpgrade];
 
@@ -24,7 +25,7 @@ export class UpgradeScene extends Phaser.Scene {
 
             this.tweens.add({
                 targets: upgrade,
-                scale: 1.4,
+                scale: 1.4 * scaleFactor,
                 duration: 1200,
                 yoyo: true,
                 repeat: -1,
@@ -32,7 +33,19 @@ export class UpgradeScene extends Phaser.Scene {
             });
 
             upgrade.on('pointerdown', () => {
-                console.log(`${upgrade.texture.key} upgrade clicked!`);
+                const gameScene = this.scene.get('GameScene');
+                
+                if (upgrade === redUpgrade) {
+                    gameScene.stats.applyBrutality();
+                } else if (upgrade === blueUpgrade) {
+                    gameScene.stats.applyTactics();
+                } else if (upgrade === greenUpgrade) {
+                    gameScene.stats.applySurvivability();
+                }
+
+                gameScene.stats.heal(gameScene.stats.state.maxHP);
+                gameScene.physics.resume();
+                this.scene.stop();
             });
         });
     }

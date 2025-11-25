@@ -1,4 +1,3 @@
-// src/classes/Bullet.js
 import { CONFIG } from "./Config.js";
 
 export class Bullet extends Phaser.Physics.Arcade.Sprite {

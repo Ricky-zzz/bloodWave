@@ -24,7 +24,6 @@ export class CollisionManager {
         s.physics.add.collider(s.player, s.enemyController.enemies, (player, enemy) => {
             this.handlePlayerHit(enemy.damage, enemy.x, enemy.y);
             if (enemy.active) {
-                // Bounce enemy
                 enemy.body.velocity.x = -enemy.body.velocity.x;
                 enemy.body.velocity.y = -enemy.body.velocity.y;
             }

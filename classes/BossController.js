@@ -21,13 +21,13 @@ export class BossController {
         this.gameTime += delta;
 
         if (this.gameTime > this.nextMinionSpawn) {
-            this.spawnBoss(false); // isMain = false
+            this.spawnBoss(false); 
             this.nextMinionSpawn += CONFIG.BOSS.MINION_TIME;
             console.log("MINION SPAWNED");
         }
 
         if (this.gameTime > this.nextBossSpawn) {
-            this.spawnBoss(true); // isMain = true
+            this.spawnBoss(true); 
             this.nextBossSpawn += CONFIG.BOSS.MAIN_TIME;
             console.log("BOSS SPAWNED");
         }

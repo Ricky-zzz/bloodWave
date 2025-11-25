@@ -29,86 +29,117 @@ export class UIScene extends Phaser.Scene {
     create() {
         const width = this.scale.width;
         const height = this.scale.height;
+        const scaleFactor = Math.min(width / 1920, height / 1080);
 
         createUIAnimations(this);
 
-        // heart 
-        this.heart = this.add.sprite(20, 20, "heart").setOrigin(0, 0).setScale(1.5);
+        this.heart = this.add.sprite(20 * scaleFactor, 20 * scaleFactor, "heart")
+            .setOrigin(0, 0)
+            .setScale(1.5 * scaleFactor);
         this.heart.play("heart_pulse");
-        this.hpText = this.add.text(100, 40, "100", {
-            fontSize: "32px",
+
+        this.hpText = this.add.text(100 * scaleFactor, 40 * scaleFactor, "100", {
+            fontSize: `${32 * scaleFactor}px`,
             fontFamily: "Arial",
             fontStyle: "bold",
             color: "#ffffff"
         });
 
-        // bullet
-        this.bulletIcon = this.add.sprite(20, 120, "bullet").setOrigin(0, 0).setScale(1.5);
+        this.bulletIcon = this.add.sprite(20 * scaleFactor, 120 * scaleFactor, "bullet")
+            .setOrigin(0, 0)
+            .setScale(1.5 * scaleFactor);
         this.bulletIcon.play("bullet_anims");
 
-        this.ammoText = this.add.text(100, 140, "30", {
-            fontSize: "32px",
+        this.ammoText = this.add.text(100 * scaleFactor, 140 * scaleFactor, "30", {
+            fontSize: `${32 * scaleFactor}px`,
             fontFamily: "Arial",
             fontStyle: "bold",
             color: "#ffffff"
         });
 
-        // --- SKILLS (icon ABOVE keycap) ---
-        const baseY = height - 110;
-        const startX = 120;
-        const gap = 200;
+        const baseY = height - 110 * scaleFactor;
+        const startX = 120 * scaleFactor;
+        const gap = 200 * scaleFactor;
 
         this.skillUI = {
-            Grenade: this.createSkillSlot(startX, baseY, "grenade_icon", "c_key"),
-            Shield: this.createSkillSlot(startX + gap, baseY, "shield_icon", "q_key"),
-            Overdrive: this.createSkillSlot(startX + gap * 2, baseY, "power_icon", "e_key"),
-            Nuke: this.createSkillSlot(startX + gap * 3, baseY, "nuke_icon", "z_key")
+            Grenade: this.createSkillSlot(startX, baseY, "grenade_icon", "c_key", scaleFactor),
+            Shield: this.createSkillSlot(startX + gap, baseY, "shield_icon", "q_key", scaleFactor),
+            Overdrive: this.createSkillSlot(startX + gap * 2, baseY, "power_icon", "e_key", scaleFactor),
+            Nuke: this.createSkillSlot(startX + gap * 3, baseY, "nuke_icon", "z_key", scaleFactor)
         };
 
-        this.scoreText = this.add.text(
-            width - 40,   
-            20,           
-            "Score: 0",
-            {
-                fontSize: "32px",
-                fontFamily: "Arial",
-                fontStyle: "bold",
-                color: "#ffffff"
-            }
-        ).setOrigin(1, 0); 
 
-        this.waveText = this.add.text(
-            width - 40,
-            70,
-            "Wave: 1",
+        this.timerText = this.add.text(
+            width - 40 * scaleFactor,
+            -5 * scaleFactor,
+            "00:00",
             {
-                fontSize: "32px",
+                fontSize: `${48 * scaleFactor}px`, 
                 fontFamily: "Arial",
                 fontStyle: "bold",
                 color: "#ffffff"
             }
         ).setOrigin(1, 0);
 
+        this.elapsedTime = 0; 
+
+        this.scoreText = this.add.text(
+            width - 40 * scaleFactor,
+            50 * scaleFactor,
+            "Score: 0",
+            {
+                fontSize: `${32 * scaleFactor}px`,
+                fontFamily: "Arial",
+                fontStyle: "bold",
+                color: "#ffffff"
+            }
+        ).setOrigin(1, 0);
+
+        this.waveText = this.add.text(
+            width - 40 * scaleFactor,
+            100 * scaleFactor,
+            "Wave: 1",
+            {
+                fontSize: `${32 * scaleFactor}px`,
+                fontFamily: "Arial",
+                fontStyle: "bold",
+                color: "#ffffff"
+            }
+        ).setOrigin(1, 0);
     }
 
-
-    createSkillSlot(x, y, iconKey, keycapKey) {
-        const skillImage = this.add.image(x, y - 0, iconKey)
+    createSkillSlot(x, y, iconKey, keycapKey, scaleFactor) {
+        const skillImage = this.add.image(x, y, iconKey)
             .setOrigin(0.5)
-            .setScale(1);
+            .setScale(1 * scaleFactor);
 
-        const keyImage = this.add.image(x, y + 55, keycapKey)
+        const keyImage = this.add.image(x, y + 55 * scaleFactor, keycapKey)
             .setOrigin(0.5)
-            .setScale(1);
+            .setScale(1 * scaleFactor);
+
         return { keyImage, skillImage };
     }
 
     update() {
         this.updateHP();
         this.updateAmmo();
+        this.updateTimer();
+
         this.scoreText.setText("Score: " + GameState.score);
         this.waveText.setText("Wave: " + GameState.wave);
+
         this.updateSkills();
+    }
+
+    updateTimer() {
+        this.elapsedTime += this.game.loop.delta / 1000; 
+
+        const totalSeconds = Math.floor(this.elapsedTime);
+        GameState.seconds = totalSeconds;
+        const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, "0");
+        const seconds = (totalSeconds % 60).toString().padStart(2, "0");
+
+        this.timerText.setText(`${minutes}:${seconds}`);
     }
 
     updateHP() {

@@ -68,7 +68,7 @@ export class BulletController {
             bullet.fire(spawnX, spawnY, a, CONFIG.WEAPON.BULLET_SPEED);
           }
         });
-        SoundManager.play("shoot");
+        SoundManager.play("shoot",{ loop: false, volume: 0.5 });
       } else {
         const bullet = this.bulletGroup.get();
         if (bullet) {

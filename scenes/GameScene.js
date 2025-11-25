@@ -38,18 +38,18 @@ export class GameScene extends Phaser.Scene {
         this.load.audio('shield', 'assets/sounds/shield.mp3');
         this.load.audio('powerup', 'assets/sounds/powerup.mp3');
         this.load.audio('nuke', 'assets/sounds/nuke.mp3');
+        this.load.audio('level_up', 'assets/sounds/angel.mp3');
     }
 
     create() {
         SoundManager.init(this);
-        SoundManager.add('gamebgm', { loop: true, volume: 0.5 });
+        SoundManager.add('gamebgm', { loop: true, volume: 2 });
         SoundManager.play('gamebgm');
 
         this.bg = this.add.tileSprite(0, 0, this.scale.width, this.scale.height, 'game_bg').setOrigin(0, 0).setScrollFactor(0);
         createAnimations(this);
         this.scene.launch('UIScene');
         
-        // Modules
         this.player = new Player(this, this.scale.width / 2, this.scale.height / 2);
         this.add.existing(this.player);
         this.physics.add.existing(this.player);
@@ -62,6 +62,7 @@ export class GameScene extends Phaser.Scene {
         this.stats = new PlayerStatsManager(this);
         this.stats.resetFromConfig();
         this.skills = new SkillsManager(this, this.stats, this.player); 
+        this.skills.resetCooldowns()
         this.enemyController = new EnemyController(this);
         this.bossController = new BossController(this); 
         this.bulletController = new BulletController(this, this.stats);
@@ -73,6 +74,7 @@ export class GameScene extends Phaser.Scene {
             this.effects.playNukeEffect();
             this.collisions.damageEnemiesInArea(this.player.x, this.player.y, radius, dmg, false, true);
         });
+        this.lastUpgradeTime = 0;
         this.createVignette();
     }
 
@@ -80,7 +82,7 @@ export class GameScene extends Phaser.Scene {
         this.shadow = this.add.rectangle(0, 0, this.scale.width, this.scale.height, 0x000000, 0.95).setOrigin(0).setScrollFactor(0).setDepth(9);
 
         if (!this.textures.exists('vision')) {
-            const radius = 1000;
+            const radius = 500;
             const texture = this.textures.createCanvas('vision', radius * 2, radius * 2);
             const ctx = texture.context;
             
@@ -111,9 +113,17 @@ export class GameScene extends Phaser.Scene {
         this.keyE = this.input.keyboard.addKey('E');
         this.keyZ = this.input.keyboard.addKey('Z');
         this.keyR = this.input.keyboard.addKey('R');
+        this.keyT = this.input.keyboard.addKey('T');
     }
 
     update(time, delta) {
+        if (GameState.seconds > 0 && GameState.seconds % 30 === 0 && GameState.seconds !== this.lastUpgradeTime) {
+            this.lastUpgradeTime = GameState.seconds;
+            SoundManager.play('level_up');
+            this.physics.pause();
+            this.scene.launch('UpgradeScene');
+        }
+
         if (GameState.isPaused) return;
 
         if (this.visionSprite) {
@@ -159,6 +169,7 @@ export class GameScene extends Phaser.Scene {
         if (Phaser.Input.Keyboard.JustDown(this.keyQ)) this.skills.useShield(time);
         if (Phaser.Input.Keyboard.JustDown(this.keyE)) this.skills.useOverdrive(time);
         if (Phaser.Input.Keyboard.JustDown(this.keyZ)) this.skills.useNuke();
+        if (Phaser.Input.Keyboard.JustDown(this.keyT)) this.skills.resetCooldowns();
     }
 
     startReload() {

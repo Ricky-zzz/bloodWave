@@ -1,4 +1,3 @@
-// src/managers/PlayerStatsManager.js
 import { GameState } from "./GameState.js";
 import { CONFIG } from "./Config.js";
 import { SoundManager } from "../utils/SoundManager.js";
@@ -68,7 +67,7 @@ export class PlayerStatsManager {
         this.state.reloadSpeed = Math.max(50, Math.floor(this.state.reloadSpeed * 0.9));
     }
     applySurvivability() {
-        this.addMaxHP(20, true);
+        this.addMaxHP(50, true);
     }
 
     startOverdrive(durationMs, multiplier = 0.5) {

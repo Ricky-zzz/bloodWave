@@ -10,7 +10,6 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
 
     spawn(x, y, typeId) {
-        // Reset Physics
         this.body.reset(x, y);
         this.setActive(true);
         this.setVisible(true);
@@ -18,7 +17,6 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.clearTint();
         this.stop(); 
 
-        // Get Stats
         const stats = CONFIG.ENEMIES.TYPES[typeId];
         
         this.setTexture(stats.KEY);
@@ -154,6 +152,5 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         });
 
         GameState.score += this.scoreValue;
-        console.log('Score:', GameState.score);
     }
 }

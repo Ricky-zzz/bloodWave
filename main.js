@@ -2,7 +2,7 @@ import { MenuScene } from "./scenes/MenuScene.js";
 import { GameScene } from "./scenes/GameScene.js";
 import { UIScene } from "./scenes/UIScene.js";
 import { EndScene } from "./scenes/EndScene.js";
-
+import { UpgradeScene } from "./scenes/UpgradeScene.js";
 
 const config = {
     type: Phaser.AUTO,
@@ -19,7 +19,10 @@ const config = {
         arcade: { debug: false }
     },
 
-    scene: [MenuScene, GameScene, UIScene, EndScene],
+    scene: [MenuScene, GameScene, UIScene, EndScene,UpgradeScene],
 };
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault(); 
+});
 
 const game = new Phaser.Game(config);

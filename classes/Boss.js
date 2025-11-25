@@ -1,4 +1,5 @@
 import { CONFIG } from "./Config.js";
+import { GameState } from "./GameState.js";
 
 export class Boss extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, bulletController) {
@@ -25,7 +26,8 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
         this.speed = stats.SPEED;
         this.bulletSpeed = stats.BULLET_SPEED;
         this.attackDelay = stats.ATTACK_DELAY;
-        
+        this.scoreValue = stats.SCORE;
+
         this.shootTimer = 0;
         this.spinTimer = 0;
         this.isTeleporting = false;
@@ -37,7 +39,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
         const player = this.scene.player;
         if (!player) return;
 
-        this.rotation += 0.02;
+        this.rotation += 0.1;
 
         if (this.isTeleporting) return; 
 
@@ -122,5 +124,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
             tint: 0xff0000
         });
         emitter.explode(50);
+        GameState.score += this.scoreValue;
+
     }
 }

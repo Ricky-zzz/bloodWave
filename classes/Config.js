@@ -3,18 +3,18 @@ export const CONFIG = {
         SPEED: 170,
         RUN_SPEED: 350,
         HEALTH: 200,
-        KNOCKBACK_FORCE: 500,    
-        IMMUNITY_DURATION: 1000, 
+        KNOCKBACK_FORCE: 600,    
+        IMMUNITY_DURATION: 1200, 
         EXP_CAP: 2000, 
     },
     WEAPON: {
-        FIRE_RATE: 200,
-        BULLET_DMG: 18,
-        RELOAD_SPD: 1500,
-        AMMO: 36,
+        FIRE_RATE: 250,
+        BULLET_DMG: 32,
+        RELOAD_SPD: 100,
+        AMMO: 12,
         BULLET_SPEED: 600,
         BULLET_LIFETIME: 9000,
-        BULLET_KNOCKBACK: 20,
+        BULLET_KNOCKBACK: 30,
     },
     SKILLS: {
         GRENADE: { COOLDOWN: 3000, DMG_MULTIPLIER: 6, SIZE: 180, THROW_DIST: 300 },
@@ -29,8 +29,8 @@ export const CONFIG = {
         TYPES: {
             1: { KEY: 'Enemy_1', HP: 60, DMG: 40, SPEED: 100,  SCORE: 20,  }, 
             2: { KEY: 'Enemy_2', HP: 50, DMG: 30, SPEED: 180, SCORE: 30,  }, 
-            3: { KEY: 'Enemy_3', HP: 150, DMG: 50, SPEED: 80, SCORE: 60,  }, 
-            4: { KEY: 'Enemy_4', HP: 40, DMG: 60, SPEED: 300, SCORE: 20,  }  
+            3: { KEY: 'Enemy_3', HP: 170, DMG: 50, SPEED: 70, SCORE: 60,  }, 
+            4: { KEY: 'Enemy_4', HP: 40, DMG: 50, SPEED: 260, SCORE: 20,  }  
         }
     },
     BOSS: {

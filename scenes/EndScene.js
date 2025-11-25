@@ -18,14 +18,17 @@ export class EndScene extends Phaser.Scene {
         SoundManager.add('menubgm', { loop: true, volume: 0.5 });
         SoundManager.play('menubgm');
 
-        const bg = this.add.image(0, 0, 'result').setOrigin(0, 0);
-        bg.setDisplaySize(this.scale.width, this.scale.height);
+        const { width, height } = this.scale;
+        const scaleFactor = Math.min(width / 1920, height / 1080);
 
-        const centerX = this.scale.width / 2;
-        const centerY = this.scale.height / 2;
+        const bg = this.add.image(0, 0, 'result').setOrigin(0, 0);
+        bg.setDisplaySize(width, height);
+
+        const centerX = width / 2;
+        const centerY = height / 2;
 
         const titleStyle = { 
-            fontSize: '80px', 
+            fontSize: `${80 * scaleFactor}px`, 
             fill: '#ff0000', 
             fontStyle: 'bold', 
             stroke: '#000000', 
@@ -33,42 +36,41 @@ export class EndScene extends Phaser.Scene {
         };
         
         const statStyle = { 
-            fontSize: '50px', 
+            fontSize: `${50 * scaleFactor}px`, 
             fill: '#ffffff', 
             fontStyle: 'bold', 
             stroke: '#000000', 
             strokeThickness: 5 
         };
 
-        this.add.text(centerX, centerY - 380, "GAME OVER", titleStyle).setOrigin(0.5);
-        this.add.text(centerX, centerY - 300, `Score: ${GameState.score}`, statStyle).setOrigin(0.5);
-        this.add.text(centerX, centerY - 220, `Wave Reached: ${GameState.wave}`, statStyle).setOrigin(0.5);
+        this.add.text(centerX, centerY - 380 * scaleFactor, "GAME OVER", titleStyle).setOrigin(0.5);
+        this.add.text(centerX, centerY - 300 * scaleFactor, `Score: ${GameState.score}`, statStyle).setOrigin(0.5);
+        this.add.text(centerX, centerY - 220 * scaleFactor, `Wave Reached: ${GameState.wave}`, statStyle).setOrigin(0.5);
 
-        this.quitBtn = this.createButton(centerX, centerY + 180, 'quit', () => {
+        this.quitBtn = this.createButton(centerX, centerY + 180 * scaleFactor, 'quit', scaleFactor, () => {
             this.restartGame();
         });
         
-        this.quitBtn.setScale(1.4); 
-
         this.input.keyboard.once('keydown-Q', () => {
             this.restartGame();
         });
     }
 
 
-    createButton(x, y, textureKey, callback) {
+    createButton(x, y, textureKey, scaleFactor, callback) {
         const img = this.add.image(0, 0, textureKey).setOrigin(0.5);
         
         const container = this.add.container(x, y, [img]);
         
         container.setSize(img.width, img.height);
         container.setInteractive({ useHandCursor: true });
+        container.setScale(1.4 * scaleFactor);
 
         container.on("pointerdown", callback);
 
         this.tweens.add({
             targets: container,
-            scale: 1.2,
+            scale: 1.2 * scaleFactor,
             duration: 1000,
             yoyo: true,
             repeat: -1,
