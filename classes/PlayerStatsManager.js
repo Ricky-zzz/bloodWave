@@ -32,6 +32,7 @@ export class PlayerStatsManager {
         const time = this.scene.time.now;
 
         if (GameState.skills.isShieldActive) return false;
+        if (GameState.player.postTeleportImmuneUntil && time < GameState.player.postTeleportImmuneUntil) return false;
         if (time < this.lastHitTime + CONFIG.PLAYER.IMMUNITY_DURATION) return false;
         this.state.hp = Math.max(0, this.state.hp - amount);
         this.lastHitTime = time;

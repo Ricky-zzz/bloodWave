@@ -19,6 +19,7 @@ export const GameState = {
         bullletKnockback: CONFIG.WEAPON.BULLET_KNOCKBACK,
         expCap: CONFIG.PLAYER.EXP_CAP,
         exp: 0,
+        postTeleportImmuneUntil: 0,
     },
 
     skills: {
@@ -47,5 +48,9 @@ export const GameState = {
         nukeMaxCooldown: CONFIG.SKILLS.NUKE.COOLDOWN,
         nukeDmg: CONFIG.SKILLS.NUKE.DAMAGE,
         nukeRadius: CONFIG.SKILLS.NUKE.RADIUS,
+        tpTimer: 0,
+        tpMaxCooldown: CONFIG.SKILLS.TELEPORT.COOLDOWN,
+        tpDist: CONFIG.SKILLS.TELEPORT.DISTANCE,
+        tpImmunity: CONFIG.SKILLS.TELEPORT.IMMUNITY,
     },
 };

@@ -26,6 +26,7 @@ export class SkillsManager {
     s.shieldTimer = Math.max(0, s.shieldTimer - delta);
     s.overdriveTimer = Math.max(0, s.overdriveTimer - delta);
     s.nukeTimer = Math.max(0, s.nukeTimer - delta);
+    s.tpTimer = Math.max(0, (s.tpTimer || 0) - delta);
 
     if (s.isShieldActive && time > s._shieldEndTime) s.isShieldActive = false;
     if (s.isOverdriveActive && time > s._overdriveEndTime)
@@ -53,6 +54,7 @@ export class SkillsManager {
     s.shieldTimer = 0;
     s.overdriveTimer = 0;
     s.nukeTimer = 0;
+    s.tpTimer = 0;
   }
 
   useGrenade() {

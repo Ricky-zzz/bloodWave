@@ -35,4 +35,18 @@ export class EffectsManager {
     this.scene.cameras.main.flash(4000, 255, 255, 255);
     this.scene.cameras.main.shake(1000, 0.1);
   }
+
+  playTeleportPuff(x, y, count = 24) {
+    const emitter = this.scene.add.particles(x, y, "particle", {
+      speed: { min: 50, max: 360 },
+      angle: { min: 0, max: 360 },
+      scale: { start: 1.0, end: 0 },
+      alpha: { start: 1, end: 0 },
+      lifespan: 500,
+      blendMode: "ADD",
+      emitting: false,
+    });
+
+    emitter.explode(count);
+  }
 }

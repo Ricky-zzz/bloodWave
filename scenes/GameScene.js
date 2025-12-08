@@ -9,6 +9,7 @@ import { EffectsManager } from "../classes/EffectsManager.js";
 import { CollisionManager } from "../classes/CollisionManager.js"; 
 import { GameState } from "../classes/GameState.js";
 import { SoundManager } from "../utils/SoundManager.js";
+import { MapManager } from "../classes/MapManager.js";
 
 export class GameScene extends Phaser.Scene {
     constructor() { super({ key: 'GameScene' }); }
@@ -46,66 +47,52 @@ export class GameScene extends Phaser.Scene {
         SoundManager.add('gamebgm', { loop: true, volume: 2 });
         SoundManager.play('gamebgm');
 
-        this.bg = this.add.tileSprite(0, 0, this.scale.width, this.scale.height, 'game_bg').setOrigin(0, 0).setScrollFactor(0);
         createAnimations(this);
         this.scene.launch('UIScene');
         
+        // --- MANAGERS INITIALIZATION ---
+        this.mapManager = new MapManager(this); // <--- NEW
+        this.mapManager.setup();                // <--- Setup BG & Vignette
+
+        this.effects = new EffectsManager(this); 
+        this.stats = new PlayerStatsManager(this);
+        this.stats.resetFromConfig();
+
+        // --- ENTITIES ---
         this.player = new Player(this, this.scale.width / 2, this.scale.height / 2);
         this.add.existing(this.player);
         this.physics.add.existing(this.player);
         this.player.setCollideWorldBounds(false); 
         this.player.setScale(1.7);
         this.player.body.setCircle(15, 10, 10); 
+        
         this.smg = this.add.sprite(this.player.x, this.player.y, 'smg').setOrigin(0.1, 0.5).setScale(0.8);
         this.isReloading = false;
-        this.effects = new EffectsManager(this); 
-        this.stats = new PlayerStatsManager(this);
-        this.stats.resetFromConfig();
+
+        // --- CONTROLLERS ---
         this.skills = new SkillsManager(this, this.stats, this.player); 
-        this.skills.resetCooldowns()
+        this.skills.resetCooldowns();
         this.enemyController = new EnemyController(this);
         this.bossController = new BossController(this); 
         this.bulletController = new BulletController(this, this.stats);
+        
+        // --- COLLISIONS ---
         this.collisions = new CollisionManager(this);
         this.collisions.setup(); 
+
+        // --- INPUTS & CAMERA ---
         this.setupInputs();
         this.cameras.main.startFollow(this.player);
+
         this.events.on('skill:nuke', ({ dmg, radius }) => {
             this.effects.playNukeEffect();
             this.collisions.damageEnemiesInArea(this.player.x, this.player.y, radius, dmg, false, true);
         });
-        this.lastUpgradeTime = 0;
-        this.createVignette();
-    }
-
-    createVignette() {
-        this.shadow = this.add.rectangle(0, 0, this.scale.width, this.scale.height, 0x000000, 0.95).setOrigin(0).setScrollFactor(0).setDepth(9);
-
-        if (!this.textures.exists('vision')) {
-            const radius = 500;
-            const texture = this.textures.createCanvas('vision', radius * 2, radius * 2);
-            const ctx = texture.context;
-            
-            const grd = ctx.createRadialGradient(radius, radius, 0, radius, radius, radius);
-            grd.addColorStop(0, 'rgba(255, 255, 255, 1)');
-            grd.addColorStop(1, 'rgba(255, 255, 255, 0)');
-            
-            ctx.fillStyle = grd;
-            ctx.fillRect(0, 0, radius * 2, radius * 2);
-            texture.refresh();
-        }
-
-        this.visionSprite = this.make.image({
-            x: this.player.x,
-            y: this.player.y,
-            key: 'vision',
-            add: false
-        });
         
-        const mask = new Phaser.Display.Masks.BitmapMask(this, this.visionSprite);
-        mask.invertAlpha = true;
-        this.shadow.setMask(mask);
+        this.lastUpgradeTime = 0;
     }
+
+
 
     setupInputs() {
         this.keyC = this.input.keyboard.addKey('C');
@@ -126,9 +113,8 @@ export class GameScene extends Phaser.Scene {
 
         if (GameState.isPaused) return;
 
-        if (this.visionSprite) {
-            this.visionSprite.x = this.player.x;
-            this.visionSprite.y = this.player.y;
+        if (this.mapManager) {
+            this.mapManager.update();
         }
 
         this.player.update();
@@ -136,8 +122,7 @@ export class GameScene extends Phaser.Scene {
         this.enemyController.update(time, delta);
         this.bossController.update(time, delta);
 
-        this.bg.tilePositionX = this.cameras.main.scrollX;
-        this.bg.tilePositionY = this.cameras.main.scrollY;
+        // background/vignette handled by MapManager
 
         const pointer = this.input.activePointer;
         const aimAngle = Phaser.Math.Angle.Between(this.player.x, this.player.y, pointer.worldX, pointer.worldY);
@@ -154,11 +139,11 @@ export class GameScene extends Phaser.Scene {
             this.smg.flipY = (aimAngle > Math.PI / 2 || aimAngle < -Math.PI / 2);
         }
 
-        if (this.input.activePointer.isDown && !this.isReloading) {
+        if ((pointer.leftButtonDown && pointer.leftButtonDown()) && !this.isReloading) {
             const result = this.bulletController.shoot(this.smg.x, this.smg.y, this.smg.rotation);
             if (result === "EMPTY") {
                 this.startReload();
-            }   
+            }
         }
         if (Phaser.Input.Keyboard.JustDown(this.keyR) && !this.isReloading) {
             if (GameState.player.ammo < GameState.player.maxAmmo) {
