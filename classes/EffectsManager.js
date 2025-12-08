@@ -17,7 +17,7 @@ export class EffectsManager {
       speed: { min: 100, max: 200 },
       angle: { min: 0, max: 360 },
       gravityY: -200,
-      scale: { start: 1.5, end: 0 },
+      scale: { start: 1.9, end: 0 },
       alpha: { start: 1, end: 0 },
       lifespan: 1500,
       tint: 0xff0000,

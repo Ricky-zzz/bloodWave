@@ -36,6 +36,7 @@ export class EnemyController {
     spawnEnemy() {
         const enemy = this.enemies.get();
         if (enemy) {
+            // 1. Randomize Type
             const rand = Math.random();
             let typeId = 1;
             if (rand > 0.8) typeId = 4; 
@@ -43,29 +44,14 @@ export class EnemyController {
             else if (rand > 0.4) typeId = 2; 
 
             const cam = this.scene.cameras.main;
-            const padding = 20; 
+            const padding = 60; 
             
-            let x, y;
-            const edge = Phaser.Math.Between(0, 3);
 
-            switch(edge) {
-                case 0: // Top
-                    x = cam.scrollX + Phaser.Math.Between(0, cam.width);
-                    y = cam.scrollY - padding;
-                    break;
-                case 1: // Right
-                    x = cam.scrollX + cam.width + padding;
-                    y = cam.scrollY + Phaser.Math.Between(0, cam.height);
-                    break;
-                case 2: // Bottom
-                    x = cam.scrollX + Phaser.Math.Between(0, cam.width);
-                    y = cam.scrollY + cam.height + padding;
-                    break;
-                case 3: // Left
-                    x = cam.scrollX - padding;
-                    y = cam.scrollY + Phaser.Math.Between(0, cam.height);
-                    break;
-            }
+            let x = Phaser.Math.Between(cam.scrollX + 50, cam.scrollX + cam.width - 50);
+
+            let y = cam.scrollY - padding;
+
+            y -= Phaser.Math.Between(0, 100);
 
             enemy.spawn(x, y, typeId);
         }

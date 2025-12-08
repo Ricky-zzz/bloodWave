@@ -5,6 +5,9 @@ export const GameState = {
     wave: 1,
     seconds: 0,
     isPaused: false,
+    goalText: "Find your sister",
+    distanceToGoal: 0,
+    sceneType: "forest",
 
     player: {
         hp: CONFIG.PLAYER.HEALTH,

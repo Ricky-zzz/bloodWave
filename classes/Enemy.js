@@ -11,6 +11,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     spawn(x, y, typeId) {
         this.body.reset(x, y);
+        this.body.enable = true;
+        this.enableBody(true, x, y, true, true);
         this.setActive(true);
         this.setVisible(true);
         this.setScale(1.5);
@@ -113,7 +115,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         });
 
         if (this.hp <= 0) {
-            if (this.typeId === 4 && !skipDeathEffect) this.explode(); // Exploder blows up on death
+            if (this.typeId === 4 && !skipDeathEffect) this.explode(); 
             else this.die();
         }
     }
@@ -135,7 +137,13 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     die() {
         this.setActive(false);
         this.setVisible(false);
+        this.body.enable = false;
+        this.disableBody(true, false);
         this.body.stop();
+        
+        // Clear any ongoing timers/tweens
+        this.isCharging = false;
+        this.knockbackTimer = 0;
 
         const emitter = this.scene.add.particles(this.x, this.y, 'particle', {
             speed: { min: 50, max: 200 },

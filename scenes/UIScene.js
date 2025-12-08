@@ -95,12 +95,24 @@ export class UIScene extends Phaser.Scene {
             }
         ).setOrigin(1, 0);
 
-        this.waveText = this.add.text(
+        this.goalText = this.add.text(
             width - 40 * scaleFactor,
             100 * scaleFactor,
-            "Wave: 1",
+            "Goal: Find your sister",
             {
-                fontSize: `${32 * scaleFactor}px`,
+                fontSize: `${28 * scaleFactor}px`,
+                fontFamily: "Arial",
+                fontStyle: "bold",
+                color: "#ffff00"
+            }
+        ).setOrigin(1, 0);
+        
+        this.distanceText = this.add.text(
+            width - 40 * scaleFactor,
+            140 * scaleFactor,
+            "Distance: 0",
+            {
+                fontSize: `${24 * scaleFactor}px`,
                 fontFamily: "Arial",
                 fontStyle: "bold",
                 color: "#ffffff"
@@ -126,7 +138,15 @@ export class UIScene extends Phaser.Scene {
         this.updateTimer();
 
         this.scoreText.setText("Score: " + GameState.score);
-        this.waveText.setText("Wave: " + GameState.wave);
+        
+        this.goalText.setText("Goal: " + GameState.goalText);
+        
+        if (GameState.sceneType === "forest") {
+            this.distanceText.setVisible(true);
+            this.distanceText.setText("Distance: " + GameState.distanceToGoal);
+        } else {
+            this.distanceText.setVisible(false);
+        }
 
         this.updateSkills();
     }

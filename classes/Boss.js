@@ -130,6 +130,8 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
   die() {
     this.setActive(false);
     this.setVisible(false);
+    this.body.enable = false;
+    this.disableBody(true, false);
     this.body.stop();
     this.bulletController.clearBulletsForOwner(this);
 
