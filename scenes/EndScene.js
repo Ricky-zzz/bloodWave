@@ -45,8 +45,6 @@ export class EndScene extends Phaser.Scene {
 
         this.add.text(centerX, centerY - 380 * scaleFactor, "GAME OVER", titleStyle).setOrigin(0.5);
         this.add.text(centerX, centerY - 300 * scaleFactor, `Score: ${GameState.score}`, statStyle).setOrigin(0.5);
-        this.add.text(centerX, centerY - 220 * scaleFactor, `Wave Reached: ${GameState.wave}`, statStyle).setOrigin(0.5);
-
         this.quitBtn = this.createButton(centerX, centerY + 180 * scaleFactor, 'quit', scaleFactor, () => {
             this.restartGame();
         });

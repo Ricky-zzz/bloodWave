@@ -37,12 +37,12 @@ export class MapManager {
 
         this.generateTrees(w, h);
 
-        this.createVignette();
+        this.createVignette(900);
     }
 
     generateTrees(w, h) {
         this.trees = this.scene.physics.add.staticGroup();
-        const treeCount = 900;
+        const treeCount = 1000;
 
         for (let i = 0; i < treeCount; i++) {
             const x = Phaser.Math.Between(0, w);
@@ -82,6 +82,7 @@ export class MapManager {
             .setDepth(-1);
 
         this.createArenaBorders(w, h);
+        this.createVignette(1200);
     }
 
     createArenaBorders(w, h) {
@@ -100,7 +101,7 @@ export class MapManager {
         }
     }
 
-    createVignette() {
+    createVignette(radius) {
         const width = this.scene.scale.width;
         const height = this.scene.scale.height;
 
@@ -108,18 +109,19 @@ export class MapManager {
             .setOrigin(0)
             .setScrollFactor(0)
             .setDepth(9);
+        // Ensure we have a sensible radius. If none provided, use the larger screen dimension.
+        const r = radius || Math.max(width, height);
 
         if (!this.scene.textures.exists('vision')) {
-            const radius = 900;
-            const texture = this.scene.textures.createCanvas('vision', radius * 2, radius * 2);
+            const texture = this.scene.textures.createCanvas('vision', r * 2, r * 2);
             const ctx = texture.context;
 
-            const grd = ctx.createRadialGradient(radius, radius, 0, radius, radius, radius);
+            const grd = ctx.createRadialGradient(r, r, 0, r, r, r);
             grd.addColorStop(0, 'rgba(255, 255, 255, 1)');
             grd.addColorStop(1, 'rgba(255, 255, 255, 0)');
 
             ctx.fillStyle = grd;
-            ctx.fillRect(0, 0, radius * 2, radius * 2);
+            ctx.fillRect(0, 0, r * 2, r * 2);
             texture.refresh();
         }
 
@@ -128,7 +130,7 @@ export class MapManager {
             y: this.scene.scale.height / 2,
             key: 'vision',
             add: false
-        });
+        }).setDisplaySize(r * 2, r * 2);
 
         this.visionSprite.setScrollFactor(0);
 

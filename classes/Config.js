@@ -35,7 +35,7 @@ export const CONFIG = {
     FINAL_BOSS: {
         KEY: 'Sister', 
         HP: 3000, 
-        DMG: 60, 
+        DMG: 50, 
         SPEED: 350, 
         SCALE: 1.8, 
         SCORE: 10000,

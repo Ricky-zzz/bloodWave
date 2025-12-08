@@ -7,6 +7,8 @@ export class UIScene extends Phaser.Scene {
     }
 
     preload() {
+
+        this.load.image('prof', 'assets/imgs/player/dina.png');
         this.load.image('c_key', 'assets/imgs/stats/c.png');
         this.load.image('q_key', 'assets/imgs/stats/q.png');
         this.load.image('e_key', 'assets/imgs/stats/e.png');
@@ -33,29 +35,32 @@ export class UIScene extends Phaser.Scene {
 
         createUIAnimations(this);
 
-        this.heart = this.add.sprite(20 * scaleFactor, 20 * scaleFactor, "heart")
+        this.profilePic = this.add.image(20 * scaleFactor, 20 * scaleFactor - 30, 'prof')
+        .setOrigin(0.0).setScale(0.9 * scaleFactor);
+
+        this.heart = this.add.sprite(20 * scaleFactor + 170, 20 * scaleFactor, "heart")
             .setOrigin(0, 0)
             .setScale(1.5 * scaleFactor);
         this.heart.play("heart_pulse");
 
-        this.hpText = this.add.text(100 * scaleFactor, 40 * scaleFactor, "100", {
+        this.hpText = this.add.text(95 * scaleFactor + 160, 35 * scaleFactor, "100", {
             fontSize: `${32 * scaleFactor}px`,
             fontFamily: "Arial",
             fontStyle: "bold",
             color: "#ffffff"
-        });
+        }).setOrigin(0, 0);
 
-        this.bulletIcon = this.add.sprite(20 * scaleFactor, 120 * scaleFactor, "bullet")
+        this.bulletIcon = this.add.sprite(20 * scaleFactor + 170, 90 * scaleFactor, "bullet")
             .setOrigin(0, 0)
             .setScale(1.5 * scaleFactor);
         this.bulletIcon.play("bullet_anims");
 
-        this.ammoText = this.add.text(100 * scaleFactor, 140 * scaleFactor, "30", {
+        this.ammoText = this.add.text(95 * scaleFactor + 160, 105 * scaleFactor, "30", {
             fontSize: `${32 * scaleFactor}px`,
             fontFamily: "Arial",
             fontStyle: "bold",
             color: "#ffffff"
-        });
+        }).setOrigin(0, 0);
 
         const baseY = height - 110 * scaleFactor;
         const startX = 120 * scaleFactor;

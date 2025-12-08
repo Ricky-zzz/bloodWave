@@ -1,4 +1,5 @@
 import { CONFIG } from "./Config.js";
+import { SoundManager } from "../utils/SoundManager.js";
 
 export class Sister extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, bulletController = null) {
@@ -97,33 +98,30 @@ export class Sister extends Phaser.Physics.Arcade.Sprite {
 
 
     performTeleport(player) {
-        // Prevent multiple teleports triggering at once
         if (this.isTeleporting) return;
+        SoundManager.play('hina_tp');
         this.isTeleporting = true;
 
         this.body.setVelocity(0);
-        this.state = "IDLE"; // Lock state
+        this.state = "IDLE"; 
 
-        // Fade Out
         this.scene.tweens.add({
             targets: this,
             alpha: 0,
             duration: 300,
             onComplete: () => {
-                // Move position
                 const angle = Math.random() * Math.PI * 2;
                 const teleportDist = 250;
                 this.x = player.x + Math.cos(angle) * teleportDist;
                 this.y = player.y + Math.sin(angle) * teleportDist;
 
-                // Fade In
                 this.scene.tweens.add({
                     targets: this,
                     alpha: 1,
                     duration: 300,
                     onComplete: () => {
                         this.isTeleporting = false;
-                        this.state = "ATTACK"; // Attack immediately
+                        this.state = "ATTACK"; 
                         this.chooseAttackPattern();
                     }
                 });
@@ -156,6 +154,7 @@ export class Sister extends Phaser.Physics.Arcade.Sprite {
     }
 
     patternSpiral() {
+        SoundManager.play('hina_atk1');
         let angle = 0;
         this.scene.time.addEvent({
             delay: 70,
@@ -170,6 +169,7 @@ export class Sister extends Phaser.Physics.Arcade.Sprite {
     }
 
     patternRing() {
+        SoundManager.play('hina_atk1');
         const count = 24;
         for (let i = 0; i < count; i++) {
             const angle = (Math.PI * 2 / count) * i;
@@ -178,6 +178,7 @@ export class Sister extends Phaser.Physics.Arcade.Sprite {
     }
 
     patternWall() {
+        SoundManager.play('hina_atk2');
         if (!this.scene.player.active) return;
         const baseAngle = Phaser.Math.Angle.Between(this.x, this.y, this.scene.player.x, this.scene.player.y);
         for (let i = -2; i <= 2; i++) {
@@ -186,6 +187,7 @@ export class Sister extends Phaser.Physics.Arcade.Sprite {
         }
     }
     patternFlower() {
+        SoundManager.play('hina_atk2');
         let rotationOffset = 0;
         const petals = 5; 
 
@@ -208,7 +210,7 @@ export class Sister extends Phaser.Physics.Arcade.Sprite {
 
     patternSniper() {
         if (!this.scene.player.active) return;
-
+        SoundManager.play('hina_atk3');
 
         const targetAngle = Phaser.Math.Angle.Between(this.x, this.y, this.scene.player.x, this.scene.player.y);
 
@@ -224,6 +226,7 @@ export class Sister extends Phaser.Physics.Arcade.Sprite {
 
     patternScatter() {
         if (!this.scene.player.active) return;
+        SoundManager.play('hina_atk3');
 
         const baseAngle = Phaser.Math.Angle.Between(this.x, this.y, this.scene.player.x, this.scene.player.y);
 
@@ -246,6 +249,7 @@ export class Sister extends Phaser.Physics.Arcade.Sprite {
     }
 
     enterPhase2() {
+        SoundManager.play('hina_atk2');
         this.phase = 2;
         this.setTint(0xff0000);
         this.speed *= 1.5;
@@ -255,6 +259,7 @@ export class Sister extends Phaser.Physics.Arcade.Sprite {
 
     takeDamage(amount) {
         if (!this.isBoss) return;
+        SoundManager.play('damage');
         this.hp -= amount;
         this.setTintFill(0xffffff);
         this.scene.time.delayedCall(100, () => {
@@ -268,6 +273,7 @@ export class Sister extends Phaser.Physics.Arcade.Sprite {
     }
 
     die() {
+        SoundManager.play('hina_defeat');
         this.setActive(false);
         this.setVisible(false);
         this.body.enable = false; 

@@ -15,6 +15,15 @@ import { Sister } from "../classes/Sister.js";
 export class BossScene extends Phaser.Scene {
     constructor() { super({ key: 'BossScene' }); }
 
+    preload() {
+
+        this.load.audio('hina_defeat', 'assets/sounds/hina_defeat.mp3');
+        this.load.audio('hina_tp', 'assets/sounds/hina_tp.mp3');
+        this.load.audio('hina_atk1', 'assets/sounds/hina_atk1.mp3');
+        this.load.audio('hina_atk2', 'assets/sounds/hina_atk2.mp3');
+        this.load.audio('hina_atk3', 'assets/sounds/hina_atk3.mp3');
+    }
+
     create() {
         SoundManager.init(this);
         SoundManager.add('gamebgm', { loop: true, volume: 2 });
