@@ -43,7 +43,12 @@ export class EndScene extends Phaser.Scene {
             strokeThickness: 5 
         };
 
-        this.add.text(centerX, centerY - 380 * scaleFactor, "GAME OVER", titleStyle).setOrigin(0.5);
+        const isWin = this.registry.get('isWin') ?? false;
+        const resultText = isWin ? "YOU WIN" : "GAME OVER";
+        const titleColor = isWin ? '#00ff00' : '#ff0000';
+        titleStyle.fill = titleColor;
+
+        this.add.text(centerX, centerY - 380 * scaleFactor, resultText, titleStyle).setOrigin(0.5);
         this.add.text(centerX, centerY - 300 * scaleFactor, `Score: ${GameState.score}`, statStyle).setOrigin(0.5);
         this.quitBtn = this.createButton(centerX, centerY + 180 * scaleFactor, 'quit', scaleFactor, () => {
             this.restartGame();

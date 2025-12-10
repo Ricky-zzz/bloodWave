@@ -2,14 +2,14 @@ export const CONFIG = {
     PLAYER: {
         SPEED: 170,
         RUN_SPEED: 350,
-        HEALTH: 250,
+        HEALTH: 220,
         KNOCKBACK_FORCE: 600,
         IMMUNITY_DURATION: 1000,
         EXP_CAP: 2000,
     },
     WEAPON: {
         FIRE_RATE: 220,
-        BULLET_DMG: 36,
+        BULLET_DMG: 30,
         RELOAD_SPD: 1000,
         AMMO: 15,
         BULLET_SPEED: 700,
@@ -25,10 +25,10 @@ export const CONFIG = {
     },
     MAP: {
         FOREST_WIDTH: 4000,
-        FOREST_HEIGHT: 4000, 
+        FOREST_HEIGHT: 16000, 
 
-        ARENA_WIDTH: 2400,
-        ARENA_HEIGHT: 2400,
+        ARENA_WIDTH: 2000,
+        ARENA_HEIGHT: 2000,
 
         BOSS_ZONE_Y: 0
     },
@@ -45,7 +45,7 @@ export const CONFIG = {
         PREFERRED_DIST: 300 
     },
     ENEMIES: {
-        SPAWN_AHEAD_DIST: 700,
+        SPAWN_AHEAD_DIST: 900,
         BASE_SPAWN_RATE: 1200,
         MIN_SPAWN_RATE: 300,
         DIFFICULTY_STEP: 30000,
@@ -53,7 +53,7 @@ export const CONFIG = {
             1: { KEY: 'Enemy_1', HP: 60, DMG: 30, SPEED: 100, SCORE: 20, },
             2: { KEY: 'Enemy_2', HP: 50, DMG: 20, SPEED: 180, SCORE: 30, },
             3: { KEY: 'Enemy_3', HP: 170, DMG: 40, SPEED: 70, SCORE: 60, },
-            4: { KEY: 'Enemy_4', HP: 40, DMG: 40, SPEED: 260, SCORE: 20, }
+            4: { KEY: 'Enemy_4', HP: 20, DMG: 40, SPEED: 260, SCORE: 20, }
         }
     },
     BOSS: {

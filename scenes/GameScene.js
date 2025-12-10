@@ -122,7 +122,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     update(time, delta) {
-        if (GameState.seconds > 0 && GameState.seconds % 60 === 0 && GameState.seconds !== this.lastUpgradeTime) {
+        if (GameState.seconds > 0 && GameState.seconds % 80 === 0 && GameState.seconds !== this.lastUpgradeTime) {
             this.lastUpgradeTime = GameState.seconds;
             SoundManager.play('level_up');
             this.physics.pause();
@@ -208,26 +208,30 @@ export class GameScene extends Phaser.Scene {
         });
     }
 
-    showGameOverScreen() {
+    showGameOverScreen(isWin = false) {
         this.physics.pause();
         this.scene.stop('UIScene');
-
         SoundManager.stopAll();
+        this.registry.set('isWin', isWin);
         this.scene.start('EndScene');
     }
 
-    transitionToBoss() {
-        if (this.isTransitioning) return;
-        this.isTransitioning = true;
+transitionToBoss() {
+    if (this.isTransitioning) return;
+    this.isTransitioning = true;
 
-        this.physics.pause();
-        SoundManager.stop('gamebgm');
+    this.physics.pause();
+    SoundManager.stop('gamebgm');
+    this.cameras.main.fade(1000, 0, 0, 0);
 
-        this.cameras.main.fade(1000, 0, 0, 0);
+    this.time.delayedCall(1000, () => {
+        this.scene.stop('UIScene');
+        
+        this.scene.start('StoryScene', {
 
-        this.time.delayedCall(1000, () => {
-            this.scene.stop('UIScene');
-            this.scene.start('BossScene');
+            images: ['brainwash'], 
+            nextScene: 'BossScene' 
         });
-    }
+    });
+}
 }

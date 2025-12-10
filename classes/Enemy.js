@@ -141,7 +141,6 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.disableBody(true, false);
         this.body.stop();
         
-        // Clear any ongoing timers/tweens
         this.isCharging = false;
         this.knockbackTimer = 0;
 

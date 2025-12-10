@@ -1,5 +1,7 @@
 import { CONFIG } from "./Config.js";
+import { GameState } from "../classes/GameState.js";
 import { SoundManager } from "../utils/SoundManager.js";
+import { EffectsManager } from "./EffectsManager.js";
 
 export class Sister extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, bulletController = null) {
@@ -23,6 +25,7 @@ export class Sister extends Phaser.Physics.Arcade.Sprite {
             this.hp = CONFIG.FINAL_BOSS.HP;
             this.maxHp = CONFIG.FINAL_BOSS.HP;
             this.speed = CONFIG.FINAL_BOSS.SPEED;
+            this.scoreplus = CONFIG.FINAL_BOSS.SCORE;
             this.setTint(0xffaaaa);
 
             this.state = "CHASE";
@@ -62,12 +65,12 @@ export class Sister extends Phaser.Physics.Arcade.Sprite {
                 } else {
                     this.body.setVelocity(0);
                     this.state = "ATTACK";
-                    this.attackTimer = 0; 
+                    this.attackTimer = 0;
                 }
                 break;
 
             case "ATTACK":
-                this.body.setVelocity(0); 
+                this.body.setVelocity(0);
                 this.play('sis_idle', true);
 
                 this.attackTimer += delta;
@@ -103,7 +106,7 @@ export class Sister extends Phaser.Physics.Arcade.Sprite {
         this.isTeleporting = true;
 
         this.body.setVelocity(0);
-        this.state = "IDLE"; 
+        this.state = "IDLE";
 
         this.scene.tweens.add({
             targets: this,
@@ -121,7 +124,7 @@ export class Sister extends Phaser.Physics.Arcade.Sprite {
                     duration: 300,
                     onComplete: () => {
                         this.isTeleporting = false;
-                        this.state = "ATTACK"; 
+                        this.state = "ATTACK";
                         this.chooseAttackPattern();
                     }
                 });
@@ -189,11 +192,11 @@ export class Sister extends Phaser.Physics.Arcade.Sprite {
     patternFlower() {
         SoundManager.play('hina_atk2');
         let rotationOffset = 0;
-        const petals = 5; 
+        const petals = 5;
 
         this.scene.time.addEvent({
             delay: 100,
-            repeat: 25, 
+            repeat: 25,
             callback: () => {
                 if (!this.active) return;
 
@@ -215,8 +218,8 @@ export class Sister extends Phaser.Physics.Arcade.Sprite {
         const targetAngle = Phaser.Math.Angle.Between(this.x, this.y, this.scene.player.x, this.scene.player.y);
 
         this.scene.time.addEvent({
-            delay: 60, 
-            repeat: 12, 
+            delay: 60,
+            repeat: 12,
             callback: () => {
                 if (!this.active) return;
                 this.bulletController.fire(this.x, this.y, targetAngle, CONFIG.FINAL_BOSS.BULLET_SPEED * 1.5);
@@ -276,15 +279,30 @@ export class Sister extends Phaser.Physics.Arcade.Sprite {
         SoundManager.play('hina_defeat');
         this.setActive(false);
         this.setVisible(false);
-        this.body.enable = false; 
-
-        this.scene.scene.stop('UIScene');
-        this.scene.add.text(this.scene.scale.width / 2, this.scene.scale.height / 2, "VICTORY", {
-            fontSize: '64px', fill: '#00ff00'
-        }).setOrigin(0.5).setScrollFactor(0);
-
-        this.scene.time.delayedCall(3000, () => {
-            this.scene.scene.start('MenuScene'); 
+        this.body.enable = false;
+        this.body.stop();
+        GameState.score += this.scoreplus;
+        
+        const emitter = this.scene.add.particles(this.x, this.y, "particle", {
+            speed: { min: 100, max: 200 },
+            angle: { min: 0, max: 360 },
+            gravityY: -200,
+            scale: { start: 1.5, end: 0 },
+            alpha: { start: 1, end: 0 },
+            lifespan: 1500,
+            tint: 0xff0000,
+            blendMode: "ADD",
+            emitting: false,
         });
+
+        emitter.explode(15);
+
+        this.scene.time.delayedCall(600, () => {
+            emitter.destroy();
+        });
+
+        if (this.scene.triggerBossDefeat) {
+            this.scene.triggerBossDefeat();
+        }
     }
 }

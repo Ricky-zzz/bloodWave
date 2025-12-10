@@ -4,13 +4,13 @@ import { PlayerStatsManager } from "../classes/PlayerStatsManager.js";
 import { SkillsManager } from "../classes/SkillsManager.js";
 import { EffectsManager } from "../classes/EffectsManager.js";
 import { CollisionManager } from "../classes/CollisionManager.js";
-import { MapManager } from "../classes/MapManager.js"; 
+import { MapManager } from "../classes/MapManager.js";
 import { GameState } from "../classes/GameState.js";
 import { SoundManager } from "../utils/SoundManager.js";
 import { CONFIG } from "../classes/Config.js";
 import { createAnimations } from "../utils/animations.js";
-import { SisterBulletController } from "../classes/SisterBulletController.js"; 
-import { Sister } from "../classes/Sister.js"; 
+import { SisterBulletController } from "../classes/SisterBulletController.js";
+import { Sister } from "../classes/Sister.js";
 
 export class BossScene extends Phaser.Scene {
     constructor() { super({ key: 'BossScene' }); }
@@ -30,7 +30,7 @@ export class BossScene extends Phaser.Scene {
         SoundManager.play('gamebgm');
 
         createAnimations(this);
-        
+
 
         this.scene.launch('UIScene');
 
@@ -40,7 +40,6 @@ export class BossScene extends Phaser.Scene {
         const startX = CONFIG.MAP.ARENA_WIDTH / 2;
         const startY = CONFIG.MAP.ARENA_HEIGHT - 200;
 
-        // 2. Player Setup
         this.player = new Player(this, startX, startY);
         this.add.existing(this.player);
         this.physics.add.existing(this.player);
@@ -48,27 +47,21 @@ export class BossScene extends Phaser.Scene {
         this.player.setScale(1.7);
         this.player.body.setCircle(15, 10, 10);
 
-        // 3. SMG Setup
         this.smg = this.add.sprite(this.player.x, this.player.y, 'smg').setOrigin(0.1, 0.5).setScale(0.8);
         this.isReloading = false;
 
-        // 4. Sister's Bullet Controller
-       this.sisterBulletController = new SisterBulletController(this);
-       this.sister = new Sister(this, CONFIG.MAP.ARENA_WIDTH / 2, CONFIG.MAP.ARENA_HEIGHT / 2, this.sisterBulletController);
+        this.sisterBulletController = new SisterBulletController(this);
+        this.sister = new Sister(this, CONFIG.MAP.ARENA_WIDTH / 2, CONFIG.MAP.ARENA_HEIGHT / 2, this.sisterBulletController);
 
-        // 4. Managers
-        this.effects = new EffectsManager(this); 
+        this.effects = new EffectsManager(this);
         this.stats = new PlayerStatsManager(this);
-        // Note: Stats are NOT reset here, carrying over HP/Ammo
 
-        this.skills = new SkillsManager(this, this.stats, this.player); 
+        this.skills = new SkillsManager(this, this.stats, this.player);
         this.bulletController = new BulletController(this, this.stats);
-        
-        // 5. Collisions
-        this.collisions = new CollisionManager(this);
-        this.collisions.setup(); 
 
-        // 6. Camera & Inputs
+        this.collisions = new CollisionManager(this);
+        this.collisions.setup();
+
         this.setupInputs();
         this.cameras.main.startFollow(this.player);
 
@@ -76,9 +69,9 @@ export class BossScene extends Phaser.Scene {
             this.effects.playNukeEffect();
             this.collisions.damageEnemiesInArea(this.player.x, this.player.y, radius, dmg, false, true);
         });
-        
+
         this.lastUpgradeTime = 0;
-        
+
         GameState.sceneType = "boss";
         GameState.goalText = "Defeat your sister";
         GameState.distanceToGoal = 0;
@@ -94,7 +87,6 @@ export class BossScene extends Phaser.Scene {
     }
 
     update(time, delta) {
-        // Upgrade Logic
 
         if (GameState.isPaused) return;
 
@@ -175,10 +167,40 @@ export class BossScene extends Phaser.Scene {
         });
     }
 
-    showGameOverScreen() {
+    triggerBossDefeat() {
         this.physics.pause();
         this.scene.stop('UIScene');
+
+        const w = this.scale.width;
+        const h = this.scale.height;
+
+        const victoryText = this.add.text(w / 2, h / 2, "VICTORY", {
+            fontSize: '96px',
+            fill: '#269926ff',
+            fontStyle: 'bold',
+            stroke: '#0a0909ff',
+            strokeThickness: 6
+        }).setOrigin(0.5).setScrollFactor(0).setAlpha(0);
+
+        this.tweens.add({
+            targets: victoryText,
+            alpha: 1,
+            scale: 1.2,
+            duration: 1000,
+            ease: 'Back.out'
+        });
+        this.time.delayedCall(4000, () => {
+            this.showGameOverScreen(true);
+        });
+    }
+
+    showGameOverScreen(isWin = true) {
+        this.registry.set('isWin', isWin);
         SoundManager.stopAll();
-        this.scene.start('EndScene');
+        this.scene.start('StoryScene', {
+
+            images: ['panel4', 'panel5'], 
+            nextScene: 'EndScene' 
+        });
     }
 }

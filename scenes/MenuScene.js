@@ -11,6 +11,14 @@ export class MenuScene extends Phaser.Scene {
         this.load.image('ins_btn', 'assets/imgs/insbg.png');
         this.load.image('title', 'assets/imgs/title.png');
         this.load.image('ins', 'assets/imgs/eme.png');
+        this.load.image('panel1', 'assets/imgs/comics/comic1.png');
+        this.load.image('panel2', 'assets/imgs/comics/comic2.png');
+        this.load.image('panel3', 'assets/imgs/comics/comic3.png');
+        this.load.image('panel4', 'assets/imgs/comics/comic4.png');
+        this.load.image('panel5', 'assets/imgs/comics/comic5.png');
+        this.load.image('brainwash', 'assets/imgs/comics/brainwash.png');
+
+        this.load.image('arrow_right', 'assets/imgs/arrow_right.png');
     }
 
     create() {
@@ -35,9 +43,14 @@ export class MenuScene extends Phaser.Scene {
             ease: "Sine.easeInOut"
         });
 
-        this.startBtn = this.createButton(width / 2, height / 2 + 50 * scaleFactor, "start_btn", scaleFactor, () => {
+
+        this.startBtn = this.createButton(width / 2, height / 2 +60 * scaleFactor, "start_btn", scaleFactor, () => {
             SoundManager.stop('menubgm');
-            this.scene.start("GameScene");
+
+            this.scene.start("StoryScene", {
+                images: ['panel1', 'panel2', 'panel3'],
+                nextScene: 'GameScene'
+            });
         });
 
         this.insBtn = this.createButton(width / 2, height / 2 + 380 * scaleFactor, "ins_btn", scaleFactor, () => {
@@ -45,7 +58,6 @@ export class MenuScene extends Phaser.Scene {
         });
 
     }
-
     createButton(x, y, textureKey, scaleFactor, callback) {
         const btnScale = 0.4;
 
